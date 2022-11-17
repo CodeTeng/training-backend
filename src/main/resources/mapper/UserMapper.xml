@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.User">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="TINYINT"/>
+        <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updater" column="updater" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,username,password,
+        nickname,email,mobile,
+        sex,avatar,status,
+        creator,createTime,updater,
+        updateTime,isDelete
+    </sql>
+
+    <!-- 查询用户的所有权限 -->
+    <!--List<String> queryAllPerms(long userId);-->
+    <select id="queryAllPerms" resultType="string">
+        select m.permission
+        from user_role ur
+                 LEFT JOIN role_menu rm on ur.roleId = rm.roleId
+                 LEFT JOIN menu m on rm.menuId = m.id
+        where ur.userId = #{userId}
+    </select>
+
+    <!--    &lt;!&ndash;List<String> getUserRoleInfo(@Param("principal") String principal);&ndash;&gt;-->
+    <!--    <select id="getUserRoleInfo" resultType="java.lang.String">-->
+    <!--        select name-->
+    <!--        from role-->
+    <!--        where id in (select ur.roleId-->
+    <!--                     from user_role ur-->
+    <!--                     where ur.userId = (select id from user where username = #{principal}));-->
+    <!--    </select>-->
+
+    <!--    &lt;!&ndash;List<String> getUserPermissionInfo(@Param("roles") List<String> roles);&ndash;&gt;-->
+    <!--    <select id="getUserPermissionInfo" resultType="java.lang.String">-->
+    <!--        select permission from menu where id in (select menuId from role_menu where roleId in (select id-->
+    <!--        from role-->
+    <!--        where name in-->
+    <!--        <foreach collection="roles" item="name" open="(" separator="," close=")">-->
+    <!--            #{name}-->
+    <!--        </foreach>))-->
+    <!--    </select>-->
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.UserTokenMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.UserToken">
+        <id property="userId" column="userId" jdbcType="BIGINT"/>
+        <result property="token" column="token" jdbcType="VARCHAR"/>
+        <result property="expireTime" column="expireTime" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        userId,token,expireTime,
+        updateTime
+    </sql>
+</mapper>
