@@ -8,6 +8,7 @@ import java.util.Date;
 /**
  * 用户视图
  *
+ * @author teng
  * @TableName user
  */
 @Data
@@ -18,29 +19,24 @@ public class UserVO implements Serializable {
     private Long id;
 
     /**
-     * 用户昵称
+     * 用户账号
      */
-    private String userName;
+    private String username;
 
     /**
-     * 账号
+     * 用户昵称
      */
-    private String userAccount;
+    private String nickname;
 
     /**
      * 用户头像
      */
-    private String userAvatar;
+    private String avatar;
 
     /**
      * 性别
      */
-    private Integer gender;
-
-    /**
-     * 用户角色: user, admin
-     */
-    private String userRole;
+    private Integer sex;
 
     /**
      * 创建时间
