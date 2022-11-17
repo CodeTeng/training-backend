@@ -2,10 +2,12 @@ package com.lt.modules.sys.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lt.common.utils.PageUtils;
 import com.lt.modules.sys.model.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户服务
@@ -48,4 +50,20 @@ public interface UserService extends IService<User> {
      * @return 用户
      */
     User queryByUserName(String username);
+
+    PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 修改密码
+     *
+     * @param userId      用户ID
+     * @param password    原密码
+     * @param newPassword 新密码
+     */
+    boolean updatePassword(Long userId, String password, String newPassword);
+
+    /**
+     * 添加用户
+     */
+    void saveUser(User user);
 }

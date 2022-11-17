@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 /**
 * @author teng
 * @description 针对表【menu(菜单表)】的数据库操作Service
-* @createDate 2022-11-16 19:41:17
+* @createDate 2022-11-17 17:08:18
 */
 public interface MenuService extends IService<Menu> {
 
