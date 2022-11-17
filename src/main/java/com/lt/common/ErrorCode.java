@@ -20,8 +20,8 @@ public enum ErrorCode {
     OPERATION_ERROR(50001, "操作失败"),
     SC_UNAUTHORIZED(50002, "非法token"),
     CAPTCHA_ERROR(50003, "验证码错误"),
-    LOGIN_ERROR(50004, "账号或密码错误");
-
+    LOGIN_ERROR(50004, "账号或密码错误"),
+    UPDATE_ERROR(50005, "修改失败");
     /**
      * 状态码
      */

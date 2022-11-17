@@ -76,7 +76,7 @@ public class SysLogAspect {
         //设置IP地址
         log.setIp(IPUtils.getIpAddr(request));
 
-        //用户名
+        // 用户名
         String username = ((User) SecurityUtils.getSubject().getPrincipal()).getUsername();
         log.setUsername(username);
         log.setTime(time);
