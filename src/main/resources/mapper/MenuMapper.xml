@@ -11,7 +11,8 @@
         <result property="type" column="type" jdbcType="TINYINT"/>
         <result property="parentId" column="parentId" jdbcType="BIGINT"/>
         <result property="url" column="url" jdbcType="VARCHAR"/>
-        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="icon" column="icon" jdbcType="VARCHAR"/>
+        <result property="orderNum" column="orderNum" jdbcType="INTEGER"/>
         <result property="creator" column="creator" jdbcType="VARCHAR"/>
         <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
         <result property="updater" column="updater" jdbcType="VARCHAR"/>
@@ -21,7 +22,8 @@
 
     <sql id="Base_Column_List">
         id,name,permission,
-        type,parentId,url,status,creator,
+        type,parentId,url,
+        icon,orderNum,creator,
         createTime,updater,updateTime,
         isDelete
     </sql>

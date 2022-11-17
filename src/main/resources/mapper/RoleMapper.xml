@@ -21,4 +21,12 @@
         status,creator,createTime,
         updater,updateTime,isDelete
     </sql>
+
+    <!--List<Long> queryRoleIdList(Long userId);-->
+    <select id="queryRoleIdList" resultType="java.lang.Long">
+        select ur.roleId
+        from role r
+                 left join user_role ur on r.id = ur.roleId
+        where ur.userId = #{userId}
+    </select>
 </mapper>

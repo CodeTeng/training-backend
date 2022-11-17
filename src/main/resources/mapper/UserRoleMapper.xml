@@ -17,4 +17,11 @@
         id,userId,roleId,
         createTime,updateTime,isDelete
     </sql>
+
+    <!--List<Long> queryRoleIdList(Long userId);-->
+    <select id="queryRoleIdList" resultType="java.lang.Long">
+        select roleId
+        from user_role
+        where userId = #{userId}
+    </select>
 </mapper>
