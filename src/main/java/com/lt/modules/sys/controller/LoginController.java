@@ -59,7 +59,6 @@ public class LoginController extends AbstractController {
      * 后台系统登录
      */
     @PostMapping("/sys/login")
-    @SysLog("管理员登录系统")
     public BaseResponse login(@RequestBody UserLoginRequest userLoginRequest) throws IOException {
         // 1. 验证码校验
         boolean captcha = captchaService.validate(userLoginRequest.getUuid(), userLoginRequest.getCaptcha());
@@ -92,6 +91,6 @@ public class LoginController extends AbstractController {
     }
 
     public static void main(String[] args) {
-        System.out.println(new Sha256Hash("audit_admin").toHex());
+        System.out.println(new Sha256Hash("super_admin").toHex());
     }
 }

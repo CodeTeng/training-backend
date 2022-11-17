@@ -1,36 +1,115 @@
 package com.lt.modules.sys.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.lt.common.exception.BusinessException;
+import com.lt.common.annotation.SysLog;
+import com.lt.common.utils.PageUtils;
+import com.lt.constant.UserConstant;
 import com.lt.modules.sys.model.dto.user.*;
 import com.lt.modules.sys.model.entity.User;
 import com.lt.modules.sys.model.vo.UserVO;
+import com.lt.modules.sys.service.UserRoleService;
 import com.lt.modules.sys.service.UserService;
 import com.lt.common.BaseResponse;
 import com.lt.common.ErrorCode;
 import com.lt.common.utils.ResultUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
- * 用户接口
+ * 系统用户接口
  *
  * @author teng
  */
 @RestController
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping("/sys/user")
+public class UserController extends AbstractController {
 
-    @Resource
+    @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRoleService userRoleService;
+
+    /**
+     * 所有用户列表---包含审核和停用的用户
+     */
+    @GetMapping("/list")
+    @RequiresPermissions("sys:user:list")
+    @SysLog("查看用户列表")
+    public BaseResponse list(@RequestParam Map<String, Object> params) {
+        User user = userService.getById(getUserId());
+        if (user == null) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "查看失败");
+        }
+        PageUtils page = userService.queryPage(params);
+        return ResultUtils.success(page);
+    }
+
+    /**
+     * 获取登录的用户信息
+     */
+    @GetMapping("/info")
+    public BaseResponse info() {
+        User user = getUser();
+        // 数据脱敏
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return ResultUtils.success(userVO);
+    }
+
+    /**
+     * 修改登录用户密码
+     */
+    @SysLog("修改密码")
+    @PostMapping("/password")
+    @RequiresPermissions("sys:user:update")
+    public BaseResponse password(@RequestBody UserPasswordRequest userPasswordRequest) {
+        // sha256加密
+        String password = new Sha256Hash(userPasswordRequest.getPassword()).toHex();
+        // sha256加密
+        String newPassword = new Sha256Hash(userPasswordRequest.getNewPassword()).toHex();
+        // 更新密码
+        boolean flag = userService.updatePassword(getUserId(), password, newPassword);
+        if (!flag) {
+            return ResultUtils.error(ErrorCode.UPDATE_ERROR, "密码错误");
+        }
+        return ResultUtils.success(flag);
+    }
+
+    /**
+     * 查询用户信息
+     */
+    @GetMapping("/info/{userId}")
+    @RequiresPermissions("sys:user:info")
+    @SysLog("查询用户信息")
+    public BaseResponse getUserInfo(@PathVariable("userId") Long userId) {
+        if (userId == null || userId <= 0) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
+        }
+        User user = userService.getById(userId);
+        // 获取用户所属的角色列表
+        List<Long> roleIdList = userRoleService.queryRoleIdList(userId);
+        user.setRoleIdList(roleIdList);
+        return ResultUtils.success(user);
+    }
+
+    /**
+     * 保存用户
+     */
+    @SysLog("保存用户")
+    @PostMapping("/save")
+    @RequiresPermissions("sys:user:save")
+    public BaseResponse save(@RequestBody User user) {
+        User curUser = userService.getById(getUserId());
+        user.setCreator(curUser.getUsername());
+        userService.saveUser(user);
+        return ResultUtils.success(true);
+    }
 
 //    /**
 //     * 用户注册---需要管理员审核通过后才算真正注册成功
@@ -49,180 +128,5 @@ public class UserController {
 //        }
 //        long result = userService.userRegister(username, password, nickname, checkPassword);
 //        return ResultUtils.success(result);
-//    }
-//
-//    /**
-//     * 用户登录
-//     *
-//     * @param userLoginRequest
-//     * @param request
-//     * @return
-//     */
-//    @PostMapping("/login")
-//    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
-//        if (userLoginRequest == null) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        String userAccount = userLoginRequest.getUsername();
-//        String userPassword = userLoginRequest.getPassword();
-//        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        User user = userService.userLogin(userAccount, userPassword, request);
-//        return ResultUtils.success(user);
-//    }
-//
-//    /**
-//     * 用户注销
-//     *
-//     * @param request
-//     * @return
-//     */
-//    @PostMapping("/logout")
-//    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
-//        if (request == null) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        boolean result = userService.userLogout(request);
-//        return ResultUtils.success(result);
-//    }
-//
-//    /**
-//     * 获取当前登录用户
-//     *
-//     * @param request
-//     * @return
-//     */
-//    @GetMapping("/get/login")
-//    public BaseResponse<UserVO> getLoginUser(HttpServletRequest request) {
-//        User user = userService.getLoginUser(request);
-//        UserVO userVO = new UserVO();
-//        BeanUtils.copyProperties(user, userVO);
-//        return ResultUtils.success(userVO);
-//    }
-//
-//    /**
-//     * 创建用户
-//     *
-//     * @param userAddRequest
-//     * @param request
-//     * @return
-//     */
-//    @PostMapping("/add")
-//    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
-//        if (userAddRequest == null) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        User user = new User();
-//        BeanUtils.copyProperties(userAddRequest, user);
-//        boolean result = userService.save(user);
-//        if (!result) {
-//            throw new BusinessException(ErrorCode.OPERATION_ERROR);
-//        }
-//        return ResultUtils.success(user.getId());
-//    }
-//
-//    /**
-//     * 删除用户
-//     *
-//     * @param deleteRequest
-//     * @param request
-//     * @return
-//     */
-//    @PostMapping("/delete")
-//    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
-//        if (deleteRequest == null || deleteRequest.getId() <= 0) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        boolean b = userService.removeById(deleteRequest.getId());
-//        return ResultUtils.success(b);
-//    }
-//
-//    /**
-//     * 更新用户
-//     *
-//     * @param userUpdateRequest
-//     * @param request
-//     * @return
-//     */
-//    @PostMapping("/update")
-//    public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
-//        if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        User user = new User();
-//        BeanUtils.copyProperties(userUpdateRequest, user);
-//        boolean result = userService.updateById(user);
-//        return ResultUtils.success(result);
-//    }
-//
-//    /**
-//     * 根据 id 获取用户
-//     *
-//     * @param id
-//     * @param request
-//     * @return
-//     */
-//    @GetMapping("/get")
-//    public BaseResponse<UserVO> getUserById(int id, HttpServletRequest request) {
-//        if (id <= 0) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        User user = userService.getById(id);
-//        UserVO userVO = new UserVO();
-//        BeanUtils.copyProperties(user, userVO);
-//        return ResultUtils.success(userVO);
-//    }
-//
-//    /**
-//     * 获取用户列表
-//     *
-//     * @param userQueryRequest
-//     * @param request
-//     * @return
-//     */
-//    @GetMapping("/list")
-//    public BaseResponse<List<UserVO>> listUser(UserQueryRequest userQueryRequest, HttpServletRequest request) {
-//        User userQuery = new User();
-//        if (userQueryRequest != null) {
-//            BeanUtils.copyProperties(userQueryRequest, userQuery);
-//        }
-//        QueryWrapper<User> queryWrapper = new QueryWrapper<>(userQuery);
-//        List<User> userList = userService.list(queryWrapper);
-//        List<UserVO> userVOList = userList.stream().map(user -> {
-//            UserVO userVO = new UserVO();
-//            BeanUtils.copyProperties(user, userVO);
-//            return userVO;
-//        }).collect(Collectors.toList());
-//        return ResultUtils.success(userVOList);
-//    }
-//
-//    /**
-//     * 分页获取用户列表
-//     *
-//     * @param userQueryRequest
-//     * @param request
-//     * @return
-//     */
-//    @GetMapping("/list/page")
-//    public BaseResponse<Page<UserVO>> listUserByPage(UserQueryRequest userQueryRequest, HttpServletRequest request) {
-//        long current = 1;
-//        long size = 10;
-//        User userQuery = new User();
-//        if (userQueryRequest != null) {
-//            BeanUtils.copyProperties(userQueryRequest, userQuery);
-//            current = userQueryRequest.getCurrent();
-//            size = userQueryRequest.getPageSize();
-//        }
-//        QueryWrapper<User> queryWrapper = new QueryWrapper<>(userQuery);
-//        Page<User> userPage = userService.page(new Page<>(current, size), queryWrapper);
-//        Page<UserVO> userVOPage = new PageDTO<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
-//        List<UserVO> userVOList = userPage.getRecords().stream().map(user -> {
-//            UserVO userVO = new UserVO();
-//            BeanUtils.copyProperties(user, userVO);
-//            return userVO;
-//        }).collect(Collectors.toList());
-//        userVOPage.setRecords(userVOList);
-//        return ResultUtils.success(userVOPage);
 //    }
 }

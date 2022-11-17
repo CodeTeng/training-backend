@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -36,7 +34,6 @@ public class LogController {
     @RequiresPermissions("sys:log:list")
     public BaseResponse list(@RequestParam Map<String, Object> params) {
         PageUtils page = logService.queryPage(params);
-        System.out.println(page.getList());
         return ResultUtils.success(page.getList());
     }
 }
