@@ -39,6 +39,14 @@
         where ur.userId = #{userId}
     </select>
 
+    <!--List<Long> queryAllMenuId(Long userId);-->
+    <select id="queryAllMenuId" resultType="java.lang.Long">
+        select distinct rm.menuId
+        from user_role ur
+                 left join role_menu rm on ur.roleId = rm.roleId
+        where ur.userId = #{userId}
+    </select>
+
     <!--    &lt;!&ndash;List<String> getUserRoleInfo(@Param("principal") String principal);&ndash;&gt;-->
     <!--    <select id="getUserRoleInfo" resultType="java.lang.String">-->
     <!--        select name-->

@@ -27,4 +27,18 @@
         createTime,updater,updateTime,
         isDelete
     </sql>
+
+    <!--List<Menu> queryNotButtonList();-->
+    <select id="queryNotButtonList" resultType="com.lt.modules.sys.model.entity.Menu">
+        select
+        <include refid="Base_Column_List"/>
+        from menu where type != 2 order by orderNum asc
+    </select>
+
+    <!--List<Menu> queryListParentId(Long parentId);-->
+    <select id="queryListParentId" resultType="com.lt.modules.sys.model.entity.Menu">
+        select
+        <include refid="Base_Column_List"/>
+        from menu where parentId = #{parentId} order by OrderNum asc
+    </select>
 </mapper>
