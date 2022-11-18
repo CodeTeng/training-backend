@@ -403,3 +403,23 @@ create table learn_condition
 )
     comment '学习情况表';
 
+drop table if exists config;
+-- auto-generated definition
+create table config
+(
+    id         bigint                             not null auto_increment comment 'id'
+        primary key,
+    paramKey   varchar(255)                       null comment 'key',
+    paramValue varchar(2000)                      null comment 'value',
+    status     tinyint  default 1                 null comment '状态   0：隐藏   1：显示',
+    remark     varchar(500)                       null comment '备注',
+    creator    varchar(64)                        null comment '创建者',
+    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater    varchar(64)                        null comment '更新者',
+    updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除',
+    constraint paramKey
+        unique (paramKey)
+)
+    comment '系统配置信息表';
+
