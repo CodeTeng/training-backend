@@ -1,9 +1,6 @@
 package com.lt.modules.sys.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * 菜单表
@@ -29,6 +28,7 @@ public class Menu implements Serializable, Comparable<Menu> {
     /**
      * 菜单名称
      */
+    @NotBlank(message = "菜单名称不能为空")
     private String name;
 
     /**
@@ -39,11 +39,13 @@ public class Menu implements Serializable, Comparable<Menu> {
     /**
      * 菜单类型 0-目录 1-菜单 2-按钮
      */
+    @NotBlank(message = "菜单类型不能为空")
     private Integer type;
 
     /**
      * 父菜单id 1级菜单id为0
      */
+    @NotBlank(message = "父菜单id不能为空")
     private Long parentId;
 
     /**
@@ -65,6 +67,7 @@ public class Menu implements Serializable, Comparable<Menu> {
     /**
      * 排序
      */
+    @NotBlank(message = "排序字段不能为空")
     private Integer orderNum;
 
     /**
@@ -104,6 +107,7 @@ public class Menu implements Serializable, Comparable<Menu> {
     /**
      * 是否删除 0-不删除 1-删除
      */
+    @TableLogic
     private Integer isDelete;
 
     @TableField(exist = false)

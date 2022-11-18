@@ -48,14 +48,12 @@ public class OAuth2Realm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String accessToken = (String) token.getPrincipal();
-
         //根据accessToken，查询用户信息
         UserToken tokenEntity = shiroService.queryByToken(accessToken);
         //token失效
         if (tokenEntity == null || tokenEntity.getExpireTime().getTime() < System.currentTimeMillis()) {
             throw new IncorrectCredentialsException("token失效，请重新登录");
         }
-
         // 查询用户信息
         User user = shiroService.queryUser(tokenEntity.getUserId());
         // 账号锁定

@@ -19,4 +19,9 @@ public interface UserRoleService extends IService<UserRole> {
 
 
     void saveOrUpdate(Long userId, List<Long> roleIdList);
+
+    /**
+     * 根据角色ID数组，批量删除
+     */
+    void deleteBatch(Long[] roleIds);
 }

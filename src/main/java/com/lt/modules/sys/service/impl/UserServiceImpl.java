@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -114,7 +115,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveUser(User user) {
         user.setPassword(new Sha256Hash(user.getPassword()).toHex());
         // 添加的用户状态正常
@@ -125,6 +126,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         checkRole(user);
         // 保存用户与角色的关系
         userRoleService.saveOrUpdate(user.getId(), user.getRoleIdList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(User user) {
+        if (StringUtils.isBlank(user.getPassword())) {
+            user.setPassword(null);
+        } else {
+            user.setPassword(new Sha256Hash(user.getPassword()).toHex());
+        }
+        this.updateById(user);
+        // 检查角色是否越权
+        checkRole(user);
+        // 保存用户与角色关系
+        userRoleService.saveOrUpdate(user.getId(), user.getRoleIdList());
+    }
+
+    @Override
+    public void deleteBatch(Long[] userIds) {
+        // 逻辑删除用户
+        this.removeByIds(Arrays.asList(userIds));
+    }
+
+    @Override
+    public List<Long> queryAllMenuId(Long userId) {
+        return userMapper.queryAllMenuId(userId);
     }
 
     private void checkRole(User user) {
@@ -139,16 +166,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (!roleIdList.containsAll(user.getRoleIdList())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "新增用户所选角色，不是本人创建");
         }
-    }
-
-    @Override
-    public List<String> getUserRoleInfo(String principal) {
-        return userMapper.getUserRoleInfo(principal);
-    }
-
-    @Override
-    public List<String> getUserPermissionInfo(List<String> roles) {
-        return userMapper.getUserPermissionInfo(roles);
     }
 }
 

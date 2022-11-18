@@ -28,22 +28,6 @@ public interface UserService extends IService<User> {
     long userRegister(String username, String password, String nickName, String checkPassword);
 
     /**
-     * 根据用户名查询对应角色信息
-     *
-     * @param principal 用户身份---用户名
-     * @return 用户角色信息
-     */
-    List<String> getUserRoleInfo(String principal);
-
-    /**
-     * 根据角色名查询对应权限信息
-     *
-     * @param roles 角色名集合
-     * @return 该角色对应的权限集合
-     */
-    List<String> getUserPermissionInfo(List<String> roles);
-
-    /**
      * 根据用户名获取用户
      *
      * @param username 用户名
@@ -66,4 +50,19 @@ public interface UserService extends IService<User> {
      * 添加用户
      */
     void saveUser(User user);
+
+    /**
+     * 修改用户
+     */
+    void update(User user);
+
+    /**
+     * 删除用户---反序列化错误
+     */
+    void deleteBatch(Long[] userIds);
+
+    /**
+     * 查询用户的所有菜单ID
+     */
+    List<Long> queryAllMenuId(Long userId);
 }

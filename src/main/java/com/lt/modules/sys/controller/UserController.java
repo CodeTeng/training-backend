@@ -1,5 +1,6 @@
 package com.lt.modules.sys.controller;
 
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.lt.common.annotation.SysLog;
 import com.lt.common.utils.PageUtils;
 import com.lt.constant.UserConstant;
@@ -11,6 +12,7 @@ import com.lt.modules.sys.service.UserService;
 import com.lt.common.BaseResponse;
 import com.lt.common.ErrorCode;
 import com.lt.common.utils.ResultUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
@@ -36,7 +38,7 @@ public class UserController extends AbstractController {
     private UserRoleService userRoleService;
 
     /**
-     * 所有用户列表---包含审核和停用的用户
+     * 分页用户列表---包含审核和停用的用户
      */
     @GetMapping("/list")
     @RequiresPermissions("sys:user:list")
@@ -109,6 +111,44 @@ public class UserController extends AbstractController {
         user.setCreator(curUser.getUsername());
         userService.saveUser(user);
         return ResultUtils.success(true);
+    }
+
+    /**
+     * 修改用户
+     */
+    @SysLog("修改用户")
+    @PostMapping("/update")
+    @RequiresPermissions("sys:user:update")
+    public BaseResponse update(@RequestBody User user) {
+        User curUser = userService.getById(getUserId());
+        user.setUpdater(curUser.getUsername());
+        userService.update(user);
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 删除用户-不支持批量删除 批量删除反序列化错误
+     */
+    @SysLog("删除用户")
+    @PostMapping("/delete/{id}")
+    @RequiresPermissions("sys:user:delete")
+    public BaseResponse delete(@PathVariable("id") Long id) {
+        if (id == null || id <= 0) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
+        }
+        if (id == 1L) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "超级管理员不能删除");
+        }
+        if (id.equals(getUserId())) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "当前用户不能删除");
+        }
+        User user = userService.getById(id);
+        user.setUpdater(getUser().getUsername());
+        userService.updateById(user);
+        boolean flag = userService.removeById(id);
+        // 反序列化错误
+//        userService.deleteBatch(userIds);
+        return ResultUtils.success(flag);
     }
 
 //    /**
