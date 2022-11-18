@@ -13,6 +13,7 @@ import lombok.Data;
 /**
  * 日志表
  *
+ * @author teng
  * @TableName log
  */
 @TableName(value = "log")

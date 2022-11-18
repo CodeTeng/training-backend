@@ -28,7 +28,7 @@ public class LogController {
     private LogService logService;
 
     /**
-     * 查询系统日志
+     * 分页查询系统日志
      */
     @GetMapping("/list")
     @RequiresPermissions("sys:log:list")

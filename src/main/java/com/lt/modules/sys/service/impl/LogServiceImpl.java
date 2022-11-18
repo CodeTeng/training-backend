@@ -24,10 +24,10 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-        String key = (String) params.get("key");
+        String username = (String) params.get("username");
         IPage<Log> page = this.page(
                 new Query<Log>().getPage(params),
-                new QueryWrapper<Log>().like(StringUtils.isNotBlank(key), "username", key)
+                new QueryWrapper<Log>().like(StringUtils.isNotBlank(username), "username", username)
         );
         return new PageUtils(page);
     }
