@@ -71,9 +71,9 @@ public class SysLogAspect {
             e.printStackTrace();
         }
 
-        //获取request
+        // 获取request
         HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
-        //设置IP地址
+        // 设置IP地址
         log.setIp(IPUtils.getIpAddr(request));
 
         // 用户名
