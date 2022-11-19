@@ -136,7 +136,7 @@ drop table if exists notice;
 -- auto-generated definition
 create table notice
 (
-    id         bigint auto_increment comment '公告id'
+    id         bigint                             not null auto_increment comment '公告id'
         primary key,
     title      varchar(50)                        not null comment '公告标题',
     content    text                               not null comment '公告内容',
@@ -153,7 +153,7 @@ drop table if exists message;
 -- auto-generated definition
 create table message
 (
-    id         bigint auto_increment comment '消息id'
+    id         bigint                             not null auto_increment comment '消息id'
         primary key,
     title      varchar(50)                        not null comment '消息标题',
     content    text                               not null comment '消息内容',
@@ -169,7 +169,7 @@ drop table if exists message_user;
 -- auto-generated definition
 create table message_user
 (
-    id         bigint auto_increment comment 'id'
+    id         bigint                             not null auto_increment comment 'id'
         primary key,
     messageId  bigint                             not null comment '消息id',
     userId     bigint                             not null comment '学员id',
@@ -183,7 +183,7 @@ drop table if exists organ;
 -- auto-generated definition
 create table organ
 (
-    id           bigint auto_increment comment '机构id'
+    id           bigint                             not null auto_increment comment '机构id'
         primary key,
     name         varchar(255)                       not null comment '机构名称',
     organTypeId  bigint                             not null comment '机构类型id',
@@ -206,7 +206,7 @@ create table organ_type
 (
     id         bigint                             not null auto_increment comment '机构类型id'
         primary key,
-    typeName   varchar(64)                        null comment '类型名称',
+    typeName   varchar(64)                        not null comment '类型名称',
     creator    varchar(64)                        null comment '创建者',
     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     updater    varchar(64)                        null comment '更新者',
