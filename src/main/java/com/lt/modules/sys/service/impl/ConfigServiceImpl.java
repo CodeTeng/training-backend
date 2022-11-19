@@ -36,6 +36,7 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config>
                 new QueryWrapper<Config>()
                         .like(StringUtils.isNotBlank(paramKey), "paramKey", paramKey)
                         .eq("status", 1)
+                        .eq("isDelete", 0)
         );
         return new PageUtils(page);
     }

@@ -50,6 +50,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>
                 new Query<Role>().getPage(params),
                 new QueryWrapper<Role>()
                         .like(StringUtils.isNotBlank(name), "name", name)
+                        .eq("isDelete", 0)
         );
         return new PageUtils(page);
     }

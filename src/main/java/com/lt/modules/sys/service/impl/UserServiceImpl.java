@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lt.common.utils.PageUtils;
 import com.lt.common.utils.Query;
 import com.lt.constant.UserConstant;
+import com.lt.modules.oss.service.OssService;
 import com.lt.modules.sys.mapper.UserMapper;
 import com.lt.modules.sys.model.entity.User;
 import com.lt.modules.sys.service.RoleService;
@@ -46,6 +47,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private OssService ossService;
 
     @Override
     public long userRegister(String username, String password, String nickName, String checkPassword) {
@@ -103,6 +107,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 new Query<User>().getPage(params),
                 new QueryWrapper<User>()
                         .like(StringUtils.isNotBlank(username), "username", username)
+                        .eq("isDelete", 0)
         );
         return new PageUtils(page);
     }

@@ -26,7 +26,7 @@ public class ConfigController extends AbstractController {
     private ConfigService configService;
 
     /**
-     * 所有配置列表
+     * 分页查询
      */
     @GetMapping("/list")
     @RequiresPermissions("sys:config:list")

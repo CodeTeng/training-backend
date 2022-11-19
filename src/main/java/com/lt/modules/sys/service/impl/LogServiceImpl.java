@@ -27,7 +27,8 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log>
         String username = (String) params.get("username");
         IPage<Log> page = this.page(
                 new Query<Log>().getPage(params),
-                new QueryWrapper<Log>().like(StringUtils.isNotBlank(username), "username", username)
+                new QueryWrapper<Log>()
+                        .like(StringUtils.isNotBlank(username), "username", username)
         );
         return new PageUtils(page);
     }
