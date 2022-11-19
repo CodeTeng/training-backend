@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.OrganMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.Organ">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="organTypeId" column="organTypeId" jdbcType="BIGINT"/>
+        <result property="organLogo" column="organLogo" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="chargePerson" column="chargePerson" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="intro" column="intro" jdbcType="VARCHAR"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updater" column="updater" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,organTypeId,
+        organLogo,phone,chargePerson,
+        email,intro,creator,
+        createTime,updater,updateTime,
+        isDelete
+    </sql>
+
+    <!--List<OrganVO> getOrganInfo(Long organTypeId);-->
+    <select id="getOrganInfo" resultType="com.lt.modules.sys.model.vo.OrganVO">
+        select o.id,
+               o.name,
+               ot.typeName,
+               o.organLogo,
+               o.phone,
+               o.chargePerson,
+               o.email,
+               o.intro,
+               o.creator,
+               o.createTime,
+               o.updater,
+               o.updateTime
+        from organ o
+                 left join organ_type ot on o.organTypeId = ot.id
+        where organTypeId = #{organTypeId};
+    </select>
+</mapper>
