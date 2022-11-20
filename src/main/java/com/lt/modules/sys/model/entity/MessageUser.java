@@ -10,46 +10,36 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 /**
- * 公告表
+ * 学员消息关联表
  *
  * @author teng
- * @TableName notice
+ * @TableName message_user
  */
-@TableName(value = "notice")
+@TableName(value = "message_user")
 @Data
-public class Notice implements Serializable {
+public class MessageUser implements Serializable {
     /**
-     * 公告id
+     * id
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 公告标题
+     * 消息id
      */
-    @NotBlank(message = "公告标题不能为空")
-    private String title;
+    @NotBlank(message = "消息id不能为空")
+    private Long messageId;
 
     /**
-     * 公告内容
+     * 学员id
      */
-    @NotBlank(message = "公告内容不能为空")
-    private String content;
-
-    /**
-     * 创建者
-     */
-    private String creator;
+    @NotBlank(message = "学员id不能为空")
+    private Long userId;
 
     /**
      * 创建时间
      */
     private Date createTime;
-
-    /**
-     * 更新者
-     */
-    private String updater;
 
     /**
      * 更新时间

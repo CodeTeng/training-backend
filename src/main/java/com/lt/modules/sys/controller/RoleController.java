@@ -12,6 +12,7 @@ import com.lt.modules.sys.service.RoleService;
 import com.lt.modules.sys.service.UserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -75,7 +76,7 @@ public class RoleController extends AbstractController {
     @SysLog("保存角色")
     @PostMapping("/save")
     @RequiresPermissions("sys:role:save")
-    public BaseResponse save(@RequestBody Role role) {
+    public BaseResponse save(@RequestBody @Validated Role role) {
         User user = getUser();
         role.setCreator(user.getUsername());
         roleService.saveRole(role);
@@ -88,7 +89,7 @@ public class RoleController extends AbstractController {
     @SysLog("修改角色")
     @PostMapping("/update")
     @RequiresPermissions("sys:role:update")
-    public BaseResponse update(@RequestBody Role role) {
+    public BaseResponse update(@RequestBody @Validated Role role) {
         role.setUpdater(getUser().getUsername());
         roleService.update(role);
         return ResultUtils.success(true);

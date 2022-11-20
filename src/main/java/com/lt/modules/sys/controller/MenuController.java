@@ -12,6 +12,7 @@ import com.lt.modules.sys.service.ShiroService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -85,7 +86,7 @@ public class MenuController extends AbstractController {
     @SysLog("保存菜单")
     @PostMapping("/save")
     @RequiresPermissions("sys:menu:save")
-    public BaseResponse save(@RequestBody Menu menu) {
+    public BaseResponse save(@RequestBody @Validated Menu menu) {
         // 数据校验
         verifyForm(menu);
         menu.setCreator(getUser().getUsername());
@@ -99,7 +100,7 @@ public class MenuController extends AbstractController {
     @SysLog("修改菜单")
     @PostMapping("/update")
     @RequiresPermissions("sys:menu:update")
-    public BaseResponse update(@RequestBody Menu menu) {
+    public BaseResponse update(@RequestBody @Validated Menu menu) {
         // 数据校验
         verifyForm(menu);
         menu.setUpdater(getUser().getUsername());

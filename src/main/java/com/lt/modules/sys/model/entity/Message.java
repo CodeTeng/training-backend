@@ -10,30 +10,30 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 /**
- * 公告表
+ * 消息表
  *
  * @author teng
- * @TableName notice
+ * @TableName message
  */
-@TableName(value = "notice")
+@TableName(value = "message")
 @Data
-public class Notice implements Serializable {
+public class Message implements Serializable {
     /**
-     * 公告id
+     * 消息id
      */
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 公告标题
+     * 消息标题
      */
-    @NotBlank(message = "公告标题不能为空")
+    @NotBlank(message = "消息标题不能为空")
     private String title;
 
     /**
-     * 公告内容
+     * 消息内容
      */
-    @NotBlank(message = "公告内容不能为空")
+    @NotBlank(message = "消息内容不能为空")
     private String content;
 
     /**

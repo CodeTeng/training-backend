@@ -16,11 +16,11 @@ import com.lt.modules.sys.service.OrganService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @description: 培训计划管理
@@ -102,7 +102,7 @@ public class OrganPlanController extends AbstractController {
     @PostMapping("/save")
     @SysLog("添加培训计划")
     @RequiresPermissions("sys:organ:save")
-    public BaseResponse save(@RequestBody OrganPlan organPlan) {
+    public BaseResponse save(@RequestBody @Validated OrganPlan organPlan) {
         if (organPlan == null) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
         }
@@ -124,7 +124,7 @@ public class OrganPlanController extends AbstractController {
     @PostMapping("/update")
     @SysLog("修改培训计划")
     @RequiresPermissions("sys:organ:update")
-    public BaseResponse update(@RequestBody OrganPlan organPlan) {
+    public BaseResponse update(@RequestBody @Validated OrganPlan organPlan) {
         if (organPlan == null) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
         }

@@ -9,6 +9,7 @@ import com.lt.modules.sys.model.entity.Config;
 import com.lt.modules.sys.service.ConfigService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -54,7 +55,7 @@ public class ConfigController extends AbstractController {
     @SysLog("保存配置")
     @PostMapping("/save")
     @RequiresPermissions("sys:config:save")
-    public BaseResponse save(@RequestBody Config config) {
+    public BaseResponse save(@RequestBody @Validated Config config) {
         config.setCreator(getUser().getUsername());
         configService.saveConfig(config);
         return ResultUtils.success(true);
@@ -66,7 +67,7 @@ public class ConfigController extends AbstractController {
     @SysLog("修改配置")
     @PostMapping("/update")
     @RequiresPermissions("sys:config:update")
-    public BaseResponse update(@RequestBody Config config) {
+    public BaseResponse update(@RequestBody @Validated Config config) {
         config.setUpdater(getUser().getUsername());
         configService.update(config);
         return ResultUtils.success(true);

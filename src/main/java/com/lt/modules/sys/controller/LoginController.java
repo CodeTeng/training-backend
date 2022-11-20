@@ -12,6 +12,7 @@ import com.lt.modules.sys.service.UserTokenService;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,7 +60,7 @@ public class LoginController extends AbstractController {
      * 后台系统登录
      */
     @PostMapping("/sys/login")
-    public BaseResponse login(@RequestBody UserLoginRequest userLoginRequest) throws IOException {
+    public BaseResponse login(@RequestBody @Validated UserLoginRequest userLoginRequest) throws IOException {
         // 1. 验证码校验
         boolean captcha = captchaService.validate(userLoginRequest.getUuid(), userLoginRequest.getCaptcha());
         if (!captcha) {

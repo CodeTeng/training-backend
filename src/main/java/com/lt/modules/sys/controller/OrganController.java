@@ -15,6 +15,7 @@ import com.lt.modules.sys.service.OrganTypeService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -103,7 +104,7 @@ public class OrganController extends AbstractController {
     @PostMapping("/save")
     @SysLog("添加机构")
     @RequiresPermissions("sys:organ:save")
-    public BaseResponse save(@RequestBody OrganAddRequest organAddRequest) {
+    public BaseResponse save(@RequestBody @Validated OrganAddRequest organAddRequest) {
         String typeName = organAddRequest.getTypeName();
         QueryWrapper<OrganType> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("typeName", typeName);
@@ -125,7 +126,7 @@ public class OrganController extends AbstractController {
     @SysLog("修改机构信息")
     @PostMapping("/update")
     @RequiresPermissions("sys:organ:update")
-    public BaseResponse update(@RequestBody Organ organ) {
+    public BaseResponse update(@RequestBody @Validated Organ organ) {
         organ.setUpdater(getUser().getUsername());
         boolean flag = organService.updateById(organ);
         if (!flag) {

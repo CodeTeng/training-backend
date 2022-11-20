@@ -14,6 +14,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,7 +67,7 @@ public class UserController extends AbstractController {
     @SysLog("修改密码")
     @PostMapping("/password")
     @RequiresPermissions("sys:user:update")
-    public BaseResponse password(@RequestBody UserPasswordRequest userPasswordRequest) {
+    public BaseResponse password(@RequestBody @Validated UserPasswordRequest userPasswordRequest) {
         String password = userPasswordRequest.getPassword();
         String newPassword = userPasswordRequest.getNewPassword();
         if (password.equals(newPassword)) {
@@ -107,7 +108,7 @@ public class UserController extends AbstractController {
     @SysLog("保存用户")
     @PostMapping("/save")
     @RequiresPermissions("sys:user:save")
-    public BaseResponse save(@RequestBody User user) {
+    public BaseResponse save(@RequestBody @Validated User user) {
         User curUser = userService.getById(getUserId());
         user.setCreator(curUser.getUsername());
         userService.saveUser(user);
@@ -120,7 +121,7 @@ public class UserController extends AbstractController {
     @SysLog("修改用户")
     @PostMapping("/update")
     @RequiresPermissions("sys:user:update")
-    public BaseResponse update(@RequestBody User user) {
+    public BaseResponse update(@RequestBody @Validated User user) {
         User curUser = userService.getById(getUserId());
         user.setUpdater(curUser.getUsername());
         userService.update(user);
@@ -151,23 +152,4 @@ public class UserController extends AbstractController {
 //        userService.deleteBatch(userIds);
         return ResultUtils.success(flag);
     }
-
-//    /**
-//     * 用户注册---需要管理员审核通过后才算真正注册成功
-//     */
-//    @PostMapping("/register")
-//    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
-//        if (userRegisterRequest == null) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        String username = userRegisterRequest.getUsername();
-//        String password = userRegisterRequest.getPassword();
-//        String nickname = userRegisterRequest.getNickname();
-//        String checkPassword = userRegisterRequest.getCheckPassword();
-//        if (StringUtils.isAnyBlank(username, password, nickname, checkPassword)) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        long result = userService.userRegister(username, password, nickname, checkPassword);
-//        return ResultUtils.success(result);
-//    }
 }

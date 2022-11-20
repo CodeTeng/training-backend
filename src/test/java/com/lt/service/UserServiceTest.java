@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 /**
  * 用户服务测试
  *
- * @author yupi
+ * @author teng
  */
 @SpringBootTest
 class UserServiceTest {

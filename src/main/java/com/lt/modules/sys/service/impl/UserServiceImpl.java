@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lt.common.utils.PageUtils;
 import com.lt.common.utils.Query;
 import com.lt.constant.UserConstant;
+import com.lt.modules.app.entity.dto.UserRegisterRequest;
 import com.lt.modules.oss.service.OssService;
 import com.lt.modules.sys.mapper.UserMapper;
 import com.lt.modules.sys.model.entity.User;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +34,7 @@ import java.util.Map;
 /**
  * 用户服务实现类
  *
- * @author yupi
+ * @author teng
  */
 @Service
 @Slf4j
@@ -50,45 +52,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Autowired
     private OssService ossService;
-
-    @Override
-    public long userRegister(String username, String password, String nickName, String checkPassword) {
-        // 1. 校验
-        if (StringUtils.isAnyBlank(username, password, nickName, checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数不能空");
-        }
-        if (username.length() < 4) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号过短");
-        }
-        if (password.length() < 6 || checkPassword.length() < 6) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
-        }
-        // 密码和校验密码相同
-        if (!password.equals(checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
-        }
-        synchronized (username.intern()) {
-            // 账户不能重复
-            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("username", username);
-            long count = userMapper.selectCount(queryWrapper);
-            if (count > 0) {
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
-            }
-            // 2. 加密
-            String encryptPassword = DigestUtils.md5DigestAsHex((UserConstant.PASSWORD_SALT + password).getBytes());
-            // 3. 插入数据
-            User user = new User();
-            user.setUsername(username);
-            user.setPassword(encryptPassword);
-            user.setNickname(nickName);
-            boolean saveResult = this.save(user);
-            if (!saveResult) {
-                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
-            }
-            return user.getId();
-        }
-    }
 
     @Override
     public User queryByUserName(String username) {

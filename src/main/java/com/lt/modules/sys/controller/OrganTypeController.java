@@ -9,6 +9,7 @@ import com.lt.modules.sys.model.entity.OrganType;
 import com.lt.modules.sys.service.OrganTypeService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -68,7 +69,7 @@ public class OrganTypeController extends AbstractController {
     @PostMapping("/save")
     @SysLog("添加机构类型")
     @RequiresPermissions("sys:organ:save")
-    public BaseResponse save(@RequestBody OrganType organType) {
+    public BaseResponse save(@RequestBody @Validated OrganType organType) {
         organType.setCreator(getUser().getUsername());
         boolean flag = organTypeService.save(organType);
         if (!flag) {
@@ -83,7 +84,7 @@ public class OrganTypeController extends AbstractController {
     @SysLog("修改机构类型信息")
     @PostMapping("/update")
     @RequiresPermissions("sys:organ:update")
-    public BaseResponse update(@RequestBody OrganType organType) {
+    public BaseResponse update(@RequestBody @Validated OrganType organType) {
         organType.setUpdater(getUser().getUsername());
         boolean flag = organTypeService.updateById(organType);
         if (!flag) {
