@@ -11,6 +11,9 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
       enabled: true
+  # 允许循环依赖
+  main:
+    allow-circular-references: true
   # jackson时间格式化
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss

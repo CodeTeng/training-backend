@@ -6,6 +6,7 @@
 
     <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.User">
         <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="organId" column="organId" jdbcType="BIGINT"/>
         <result property="username" column="username" jdbcType="VARCHAR"/>
         <result property="password" column="password" jdbcType="VARCHAR"/>
         <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
@@ -46,23 +47,4 @@
                  left join role_menu rm on ur.roleId = rm.roleId
         where ur.userId = #{userId}
     </select>
-
-    <!--    &lt;!&ndash;List<String> getUserRoleInfo(@Param("principal") String principal);&ndash;&gt;-->
-    <!--    <select id="getUserRoleInfo" resultType="java.lang.String">-->
-    <!--        select name-->
-    <!--        from role-->
-    <!--        where id in (select ur.roleId-->
-    <!--                     from user_role ur-->
-    <!--                     where ur.userId = (select id from user where username = #{principal}));-->
-    <!--    </select>-->
-
-    <!--    &lt;!&ndash;List<String> getUserPermissionInfo(@Param("roles") List<String> roles);&ndash;&gt;-->
-    <!--    <select id="getUserPermissionInfo" resultType="java.lang.String">-->
-    <!--        select permission from menu where id in (select menuId from role_menu where roleId in (select id-->
-    <!--        from role-->
-    <!--        where name in-->
-    <!--        <foreach collection="roles" item="name" open="(" separator="," close=")">-->
-    <!--            #{name}-->
-    <!--        </foreach>))-->
-    <!--    </select>-->
 </mapper>

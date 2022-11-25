@@ -29,7 +29,7 @@
     </sql>
 
     <!--List<OrganVO> getOrganInfo(Long organTypeId);-->
-    <select id="getOrganInfo" resultType="com.lt.modules.sys.model.vo.OrganVO">
+    <select id="getOrganInfo" resultType="com.lt.modules.sys.model.vo.organ.OrganVO">
         select o.id,
                o.name,
                ot.typeName,

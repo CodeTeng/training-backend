@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.ExamMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.Exam">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="organId" column="organId" jdbcType="BIGINT"/>
+        <result property="organName" column="organName" jdbcType="VARCHAR"/>
+        <result property="examName" column="examName" jdbcType="VARCHAR"/>
+        <result property="examDesc" column="examDesc" jdbcType="VARCHAR"/>
+        <result property="startTime" column="startTime" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="endTime" jdbcType="TIMESTAMP"/>
+        <result property="totalTime" column="totalTime" jdbcType="INTEGER"/>
+        <result property="totalScore" column="totalScore" jdbcType="INTEGER"/>
+        <result property="passScore" column="passScore" jdbcType="INTEGER"/>
+        <result property="valid" column="valid" jdbcType="TINYINT"/>
+        <result property="tips" column="tips" jdbcType="VARCHAR"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updater" column="updater" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,organId,organName,
+        examName,examDesc,examDate,
+        totalTime,totalScore,passScore,
+        valid,tips,creator,
+        createTime,updater,updateTime,
+        isDelete
+    </sql>
+</mapper>

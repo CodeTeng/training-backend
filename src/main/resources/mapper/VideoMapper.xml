@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.VideoMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.Video">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="organPlanId" column="organPlanId" jdbcType="BIGINT"/>
+        <result property="videoTypeId" column="videoTypeId" jdbcType="BIGINT"/>
+        <result property="videoTitle" column="videoTitle" jdbcType="VARCHAR"/>
+        <result property="coverUrl" column="coverUrl" jdbcType="VARCHAR"/>
+        <result property="videoUrl" column="videoUrl" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="isPublish" column="isPublish" jdbcType="TINYINT"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updater" column="updater" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,organPlanId,videoTypeId,
+        videoTitle,coverUrl,videoUrl,
+        status,isPublish,creator,
+        createTime,updater,updateTime,
+        isDelete
+    </sql>
+</mapper>

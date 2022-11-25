@@ -32,4 +32,13 @@
         from user_role
         where userId = #{userId}
     </select>
+
+    <!--List<String> getUserRoleName(Long userId);-->
+    <select id="getUserRoleName" resultType="java.lang.String">
+        select r.name
+        from user_role ur
+                 left join user u on ur.userId = u.id
+                 left join role r on ur.roleId = r.id
+        where u.id = #{userId}
+    </select>
 </mapper>

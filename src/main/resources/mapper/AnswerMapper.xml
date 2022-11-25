@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.AnswerMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.Answer">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="allOption" column="allOption" jdbcType="VARCHAR"/>
+            <result property="imagesUrl" column="imagesUrl" jdbcType="VARCHAR"/>
+            <result property="analysis" column="analysis" jdbcType="VARCHAR"/>
+            <result property="questionId" column="questionId" jdbcType="BIGINT"/>
+            <result property="trueOption" column="trueOption" jdbcType="VARCHAR"/>
+            <result property="creator" column="creator" jdbcType="VARCHAR"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updater" column="updater" jdbcType="VARCHAR"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,allOption,imagesUrl,
+        analysis,questionId,trueOption,
+        creator,createTime,updater,
+        updateTime,isDelete
+    </sql>
+</mapper>

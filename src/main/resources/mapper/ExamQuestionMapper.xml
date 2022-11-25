@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.ExamQuestionMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.ExamQuestion">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="questionIds" column="questionIds" jdbcType="VARCHAR"/>
+            <result property="examId" column="examId" jdbcType="BIGINT"/>
+            <result property="scores" column="scores" jdbcType="VARCHAR"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,questionIds,examId,
+        scores,createTime,updateTime,
+        isDelete
+    </sql>
+</mapper>

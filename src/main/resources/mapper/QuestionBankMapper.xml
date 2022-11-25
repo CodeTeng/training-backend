@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.QuestionBankMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.QuestionBank">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="bankName" column="bankName" jdbcType="VARCHAR"/>
+        <result property="organId" column="organId" jdbcType="BIGINT"/>
+        <result property="organName" column="organName" jdbcType="VARCHAR"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updater" column="updater" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <!--List<QuestionBankVO> getQuestionBank(String bankName);-->
+    <sql id="Base_Column_List">
+        id,bankName,organId,
+        organName,creator,createTime,
+        updater,updateTime,isDelete
+    </sql>
+
+    <select id="getQuestionBank" resultType="com.lt.modules.sys.model.vo.bank.QuestionBankVO">
+        select qb.bankName, o.name as organName
+        from question_bank qb
+        left join organ o on qb.organId = o.id
+        where qb.isDelete = 0
+        and o.isDelete = 0
+        <if test="bankName != null and bankName != ''">
+            and qb.bankName like concat('%', #{bankName}, '%')
+        </if>
+    </select>
+</mapper>
