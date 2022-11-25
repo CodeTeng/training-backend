@@ -24,4 +24,9 @@ public interface UserRoleService extends IService<UserRole> {
      * 根据角色ID数组，批量删除
      */
     void deleteBatch(Long[] roleIds);
+
+    /**
+     * 根据用户id获取用户的所有角色名称
+     */
+    List<String> getUserRoleName(Long userId);
 }

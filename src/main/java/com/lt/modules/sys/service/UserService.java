@@ -1,12 +1,14 @@
 package com.lt.modules.sys.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lt.common.utils.PageUtils;
-import com.lt.modules.app.entity.dto.UserRegisterRequest;
+import com.lt.modules.sys.model.dto.user.UserAddRequest;
+import com.lt.modules.sys.model.dto.user.UserUpdateRequest;
 import com.lt.modules.sys.model.entity.User;
+import com.lt.modules.sys.model.vo.UserInfoVO;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +27,6 @@ public interface UserService extends IService<User> {
      */
     User queryByUserName(String username);
 
-    PageUtils queryPage(Map<String, Object> params);
-
     /**
      * 修改密码
      *
@@ -39,12 +39,12 @@ public interface UserService extends IService<User> {
     /**
      * 添加用户
      */
-    void saveUser(User user);
+    void saveUser(UserAddRequest userAddRequest);
 
     /**
      * 修改用户
      */
-    void update(User user);
+    void update(UserUpdateRequest userUpdateRequest);
 
     /**
      * 删除用户---反序列化错误
@@ -55,4 +55,6 @@ public interface UserService extends IService<User> {
      * 查询用户的所有菜单ID
      */
     List<Long> queryAllMenuId(Long userId);
+
+    Page<UserInfoVO> queryPage(Integer pageNo, Integer pageSize, String username, String organName);
 }

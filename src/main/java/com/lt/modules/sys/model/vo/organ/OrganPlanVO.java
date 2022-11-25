@@ -1,4 +1,4 @@
-package com.lt.modules.sys.model.vo;
+package com.lt.modules.sys.model.vo.organ;
 
 import lombok.Data;
 

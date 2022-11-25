@@ -52,6 +52,11 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole>
     public void deleteBatch(Long[] roleIds) {
         userRoleMapper.deleteBatch(roleIds);
     }
+
+    @Override
+    public List<String> getUserRoleName(Long userId) {
+        return userRoleMapper.getUserRoleName(userId);
+    }
 }
 
 

@@ -3,10 +3,9 @@ package com.lt.modules.sys.service;
 import com.lt.common.utils.PageUtils;
 import com.lt.modules.sys.model.entity.OrganPlan;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.lt.modules.sys.model.vo.OrganPlanVO;
+import com.lt.modules.sys.model.vo.organ.OrganPlanVO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author teng

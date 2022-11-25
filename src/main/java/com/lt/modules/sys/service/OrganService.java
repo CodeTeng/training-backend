@@ -1,10 +1,9 @@
 package com.lt.modules.sys.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lt.common.utils.PageUtils;
 import com.lt.modules.sys.model.entity.Organ;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.lt.modules.sys.model.vo.OrganVO;
+import com.lt.modules.sys.model.vo.organ.OrganVO;
 
 import java.util.List;
 import java.util.Map;

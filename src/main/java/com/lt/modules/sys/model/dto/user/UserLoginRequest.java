@@ -17,11 +17,9 @@ public class UserLoginRequest implements Serializable {
     private static final long serialVersionUID = 3191241716373120793L;
 
     @NotBlank(message = "用户名不能为空")
-    @Min(value = 4, message = "用户名最短为4位")
     private String username;
 
     @NotBlank(message = "密码不能为空")
-    @Min(value = 6, message = "密码最短为6位")
     private String password;
 
     @NotBlank(message = "验证码不能为空")

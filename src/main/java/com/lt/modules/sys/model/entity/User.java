@@ -28,17 +28,20 @@ public class User implements Serializable {
     private Long id;
 
     /**
+     * 所属机构id
+     */
+    private Long organId;
+
+    /**
      * 用户账号
      */
     @NotBlank(message = "用户名不能为空")
-    @Min(value = 4, message = "用户名最短为4位")
     private String username;
 
     /**
      * 用户密码
      */
     @NotBlank(message = "密码不能为空")
-    @Min(value = 6, message = "密码最短为6位")
     private String password;
 
     /**

@@ -1,15 +1,16 @@
 package com.lt.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.lt.common.utils.PageUtils;
-import com.lt.common.utils.Query;
-import com.lt.constant.UserConstant;
-import com.lt.modules.app.entity.dto.UserRegisterRequest;
-import com.lt.modules.oss.service.OssService;
 import com.lt.modules.sys.mapper.UserMapper;
+import com.lt.modules.sys.model.dto.user.UserAddRequest;
+import com.lt.modules.sys.model.dto.user.UserUpdateRequest;
+import com.lt.modules.sys.model.entity.Organ;
+import com.lt.modules.sys.model.entity.Role;
 import com.lt.modules.sys.model.entity.User;
+import com.lt.modules.sys.model.vo.UserInfoVO;
+import com.lt.modules.sys.service.OrganService;
 import com.lt.modules.sys.service.RoleService;
 import com.lt.modules.sys.service.UserRoleService;
 import com.lt.modules.sys.service.UserService;
@@ -23,12 +24,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.DigestUtils;
 
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -51,7 +50,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private RoleService roleService;
 
     @Autowired
-    private OssService ossService;
+    private OrganService organService;
 
     @Override
     public User queryByUserName(String username) {
@@ -64,15 +63,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public PageUtils queryPage(Map<String, Object> params) {
-        String username = (String) params.get("username");
-        IPage<User> page = this.page(
-                new Query<User>().getPage(params),
-                new QueryWrapper<User>()
-                        .like(StringUtils.isNotBlank(username), "username", username)
-                        .eq("isDelete", 0)
+    public Page<UserInfoVO> queryPage(Integer pageNo, Integer pageSize, String username, String organName) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotBlank(username), "username", username);
+        Long organId = null;
+        if (StringUtils.isNotBlank(organName)) {
+            Organ organ = organService.getOne(new QueryWrapper<Organ>().eq("name", organName));
+            organId = organ.getId();
+        }
+        queryWrapper.eq(organId != null, "organId", organId);
+        Page<User> page = this.page(
+                new Page<>(pageNo, pageSize),
+                queryWrapper
         );
-        return new PageUtils(page);
+        List<User> records = page.getRecords();
+        List<UserInfoVO> userInfoVOList = records.stream().map(user -> {
+            UserInfoVO userInfoVO = new UserInfoVO();
+            BeanUtils.copyProperties(user, userInfoVO);
+            Organ resOrgan = organService.getById(user.getOrganId());
+            // 一些管理员哪个机构也不属于
+            if (resOrgan == null) {
+                userInfoVO.setOrganName(null);
+            } else {
+                userInfoVO.setOrganName(resOrgan.getName());
+            }
+            List<String> roleNameList = userRoleService.getUserRoleName(user.getId());
+            String roleName = StringUtils.join(roleNameList, ",");
+            userInfoVO.setRoleName(roleName);
+            return userInfoVO;
+        }).toList();
+        Page<UserInfoVO> resPage = new Page<>();
+        BeanUtils.copyProperties(page, resPage);
+        resPage.setRecords(userInfoVOList);
+        return resPage;
     }
 
     @Override
@@ -84,11 +107,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveUser(User user) {
-        user.setPassword(new Sha256Hash(user.getPassword()).toHex());
+    public void saveUser(UserAddRequest userAddRequest) {
+        User user = new User();
+        BeanUtils.copyProperties(userAddRequest, user);
+        String sexName = userAddRequest.getSexName();
+        Integer sex = null;
+        if ("男".equals(sexName)) {
+            sex = 0;
+        } else if ("女".equals(sexName)) {
+            sex = 1;
+        }
+        user.setSex(sex);
         // 添加的用户状态正常
         user.setStatus(0);
         user.setAvatar("https://teng-1310538376.cos.ap-chongqing.myqcloud.com/3718/202211171417939.png");
+        user.setPassword(new Sha256Hash(userAddRequest.getPassword()).toHex());
+        String organName = userAddRequest.getOrganName();
+        Organ organ = organService.getOne(new QueryWrapper<Organ>().eq(StringUtils.isNotBlank(organName), "name", organName));
+        if (organ == null) {
+            user.setOrganId(null);
+        } else {
+            user.setOrganId(organ.getId());
+        }
+        String roleName = userAddRequest.getRoleName();
+        List<String> roleNameList = Arrays.stream(StringUtils.split(roleName, ",")).toList();
+        List<Long> roleIdList = roleNameList.stream().map(name -> {
+            Role role = roleService.getOne(new QueryWrapper<Role>().eq("name", name));
+            return role.getId();
+        }).toList();
+        user.setRoleIdList(roleIdList);
         this.save(user);
         // 检查角色是否越权
         checkRole(user);
@@ -98,12 +145,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(User user) {
-        if (StringUtils.isBlank(user.getPassword())) {
-            user.setPassword(null);
+    public void update(UserUpdateRequest userUpdateRequest) {
+        User user = new User();
+        BeanUtils.copyProperties(userUpdateRequest, user);
+        String organName = userUpdateRequest.getOrganName();
+        Organ organ = organService.getOne(new QueryWrapper<Organ>().eq(StringUtils.isNotBlank(organName), "name", organName));
+        if (organ == null) {
+            user.setOrganId(null);
         } else {
-            user.setPassword(new Sha256Hash(user.getPassword()).toHex());
+            user.setOrganId(organ.getId());
         }
+        String roleName = userUpdateRequest.getRoleName();
+        List<String> roleNameList = Arrays.stream(StringUtils.split(roleName, ",")).toList();
+        List<Long> roleIdList = roleNameList.stream().map(name -> {
+            Role role = roleService.getOne(new QueryWrapper<Role>().eq("name", name));
+            return role.getId();
+        }).toList();
+        user.setRoleIdList(roleIdList);
+        String sexName = userUpdateRequest.getSexName();
+        Integer sex = null;
+        if ("男".equals(sexName)) {
+            sex = 0;
+        } else if ("女".equals(sexName)) {
+            sex = 1;
+        }
+        user.setSex(sex);
+        Integer status = null;
+        String statusName = userUpdateRequest.getStatusName();
+        if ("正常".equals(statusName)) {
+            status = 0;
+        } else if ("停用".equals(statusName)) {
+            status = 1;
+        } else if ("审核".equals(statusName)) {
+            status = 2;
+        }
+        user.setStatus(status);
         this.updateById(user);
         // 检查角色是否越权
         checkRole(user);
@@ -121,6 +197,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public List<Long> queryAllMenuId(Long userId) {
         return userMapper.queryAllMenuId(userId);
     }
+
 
     private void checkRole(User user) {
         // 未分配角色 直接返回

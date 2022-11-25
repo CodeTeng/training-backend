@@ -9,6 +9,7 @@ import com.lt.modules.sys.model.entity.OrganType;
 import com.lt.modules.sys.service.OrganTypeService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -96,12 +97,14 @@ public class OrganTypeController extends AbstractController {
     @SysLog("删除机构类型")
     @PostMapping("/delete/{id}")
     @RequiresPermissions("sys:organ:delete")
+    @Transactional(rollbackFor = Exception.class)
     public BaseResponse delete(@PathVariable("id") Long id) {
         if (id == null || id <= 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
         }
         OrganType organType = organTypeService.getById(id);
         organType.setUpdater(getUser().getUsername());
+        organTypeService.updateById(organType);
         boolean flag = organTypeService.removeById(organType);
         if (!flag) {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "删除失败");

@@ -57,7 +57,7 @@ public class LoginController extends AbstractController {
     }
 
     /**
-     * 后台系统登录
+     * 系统登录
      */
     @PostMapping("/sys/login")
     public BaseResponse login(@RequestBody @Validated UserLoginRequest userLoginRequest) throws IOException {
@@ -85,13 +85,13 @@ public class LoginController extends AbstractController {
     }
 
     @PostMapping("/sys/logout")
-    @SysLog("管理员退出系统")
+    @SysLog("退出系统")
     public BaseResponse logout() {
         userTokenService.logout(getUserId());
         return ResultUtils.success(true);
     }
 
     public static void main(String[] args) {
-        System.out.println(new Sha256Hash("super_admin").toHex());
+        System.out.println(new Sha256Hash("zhaoliu").toHex());
     }
 }

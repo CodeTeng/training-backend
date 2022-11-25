@@ -9,6 +9,7 @@ import com.lt.modules.sys.model.entity.Notice;
 import com.lt.modules.sys.service.NoticeService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,6 +91,7 @@ public class NoticeController extends AbstractController {
     @SysLog("删除公告")
     @PostMapping("/delete/{id}")
     @RequiresPermissions("sys:notice:delete")
+    @Transactional(rollbackFor = Exception.class)
     public BaseResponse delete(@PathVariable("id") Long id) {
         if (id == null || id <= 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
@@ -99,6 +101,7 @@ public class NoticeController extends AbstractController {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "查询失败");
         }
         notice.setUpdater(getUser().getUsername());
+        noticeService.updateById(notice);
         boolean flag = noticeService.removeById(notice);
         if (!flag) {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "删除失败");

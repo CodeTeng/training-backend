@@ -1,24 +1,29 @@
 package com.lt.modules.sys.controller;
 
+import ch.qos.logback.core.recovery.ResilientFileOutputStream;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lt.common.annotation.SysLog;
-import com.lt.common.utils.PageUtils;
 import com.lt.modules.sys.model.dto.user.*;
+import com.lt.modules.sys.model.entity.Organ;
 import com.lt.modules.sys.model.entity.User;
-import com.lt.modules.sys.model.vo.UserVO;
+import com.lt.modules.sys.model.vo.UserInfoVO;
+import com.lt.modules.sys.service.OrganService;
 import com.lt.modules.sys.service.UserRoleService;
 import com.lt.modules.sys.service.UserService;
 import com.lt.common.BaseResponse;
 import com.lt.common.ErrorCode;
 import com.lt.common.utils.ResultUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.crypto.PaddingScheme;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 系统用户接口
@@ -35,17 +40,21 @@ public class UserController extends AbstractController {
     @Autowired
     private UserRoleService userRoleService;
 
+    @Autowired
+    private OrganService organService;
+
     /**
      * 分页用户列表
      */
     @GetMapping("/list")
     @RequiresPermissions("sys:user:list")
-    public BaseResponse list(@RequestParam Map<String, Object> params) {
-        User user = userService.getById(getUserId());
-        if (user == null) {
-            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "操作失败");
+    public BaseResponse list(Integer pageNo, Integer pageSize,
+                             @RequestParam(required = false) String username,
+                             @RequestParam(required = false) String organName) {
+        if (pageNo == null || pageNo <= 0 || pageSize == null || pageSize <= 0) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
         }
-        PageUtils page = userService.queryPage(params);
+        Page<UserInfoVO> page = userService.queryPage(pageNo, pageSize, username, organName);
         return ResultUtils.success(page);
     }
 
@@ -55,14 +64,22 @@ public class UserController extends AbstractController {
     @GetMapping("/info")
     public BaseResponse info() {
         User user = getUser();
-        // 数据脱敏
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        return ResultUtils.success(userVO);
+        List<String> userRoleName = userRoleService.getUserRoleName(user.getId());
+        String roleName = StringUtils.join(userRoleName, ",");
+        UserInfoVO userInfoVO = new UserInfoVO();
+        BeanUtils.copyProperties(user, userInfoVO);
+        userInfoVO.setRoleName(roleName);
+        Organ organ = organService.getById(user.getOrganId());
+        if (organ == null) {
+            userInfoVO.setOrganName(null);
+        } else {
+            userInfoVO.setOrganName(organ.getName());
+        }
+        return ResultUtils.success(userInfoVO);
     }
 
     /**
-     * 修改登录用户密码
+     * 修改用户密码
      */
     @SysLog("修改密码")
     @PostMapping("/password")
@@ -70,6 +87,9 @@ public class UserController extends AbstractController {
     public BaseResponse password(@RequestBody @Validated UserPasswordRequest userPasswordRequest) {
         String password = userPasswordRequest.getPassword();
         String newPassword = userPasswordRequest.getNewPassword();
+        if (password.length() < 6 || newPassword.length() < 6) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "密码最短为6位");
+        }
         if (password.equals(newPassword)) {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "新密码不能和原密码一样");
         }
@@ -86,7 +106,7 @@ public class UserController extends AbstractController {
     }
 
     /**
-     * 查询用户信息
+     * 查询单个用户信息
      */
     @GetMapping("/info/{userId}")
     @RequiresPermissions("sys:user:info")
@@ -96,10 +116,39 @@ public class UserController extends AbstractController {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
         }
         User user = userService.getById(userId);
-        // 获取用户所属的角色列表
-        List<Long> roleIdList = userRoleService.queryRoleIdList(userId);
-        user.setRoleIdList(roleIdList);
-        return ResultUtils.success(user);
+        List<String> userRoleName = userRoleService.getUserRoleName(userId);
+        String roleName = StringUtils.join(userRoleName, ",");
+        UserInfoVO userInfoVO = new UserInfoVO();
+        BeanUtils.copyProperties(user, userInfoVO);
+        userInfoVO.setRoleName(roleName);
+        Organ organ = organService.getById(user.getOrganId());
+        if (organ == null) {
+            userInfoVO.setOrganName(null);
+        } else {
+            userInfoVO.setOrganName(organ.getName());
+        }
+        return ResultUtils.success(userInfoVO);
+    }
+
+    @SysLog("重置密码")
+    @RequiresPermissions("sys:user:update")
+    @PostMapping("/reset/{userId}")
+    public BaseResponse resetPassword(@PathVariable("userId") Long userId, String password) {
+        if (userId == null || userId <= 0) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
+        }
+        User user = userService.getById(userId);
+        if (password == null) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "密码不能为空");
+        }
+        if (password.length() < 6) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "密码最短为6位");
+        }
+        String encryptedPassword = new Sha256Hash(password).toHex();
+        user.setPassword(encryptedPassword);
+        user.setUpdater(getUser().getUsername());
+        userService.updateById(user);
+        return ResultUtils.success("重置成功");
     }
 
     /**
@@ -108,10 +157,14 @@ public class UserController extends AbstractController {
     @SysLog("保存用户")
     @PostMapping("/save")
     @RequiresPermissions("sys:user:save")
-    public BaseResponse save(@RequestBody @Validated User user) {
+    public BaseResponse save(@RequestBody @Validated UserAddRequest userAddRequest) {
+        String password = userAddRequest.getPassword();
+        if (password.length() < 6) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "密码最短为6位");
+        }
         User curUser = userService.getById(getUserId());
-        user.setCreator(curUser.getUsername());
-        userService.saveUser(user);
+        userAddRequest.setCreator(curUser.getUsername());
+        userService.saveUser(userAddRequest);
         return ResultUtils.success(true);
     }
 
@@ -121,10 +174,9 @@ public class UserController extends AbstractController {
     @SysLog("修改用户")
     @PostMapping("/update")
     @RequiresPermissions("sys:user:update")
-    public BaseResponse update(@RequestBody @Validated User user) {
-        User curUser = userService.getById(getUserId());
-        user.setUpdater(curUser.getUsername());
-        userService.update(user);
+    public BaseResponse update(@RequestBody @Validated UserUpdateRequest userUpdateRequest) {
+        userUpdateRequest.setUpdater(getUser().getUsername());
+        userService.update(userUpdateRequest);
         return ResultUtils.success(true);
     }
 
@@ -134,6 +186,7 @@ public class UserController extends AbstractController {
     @SysLog("删除用户")
     @PostMapping("/delete/{id}")
     @RequiresPermissions("sys:user:delete")
+    @Transactional(rollbackFor = Exception.class)
     public BaseResponse delete(@PathVariable("id") Long id) {
         if (id == null || id <= 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
@@ -148,6 +201,9 @@ public class UserController extends AbstractController {
         user.setUpdater(getUser().getUsername());
         userService.updateById(user);
         boolean flag = userService.removeById(id);
+        if (!flag) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "删除失败");
+        }
         // TODO 反序列化错误
 //        userService.deleteBatch(userIds);
         return ResultUtils.success(flag);

@@ -143,6 +143,9 @@ public class MessageController extends AbstractController {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
         }
         // 删除消息
+        Message message = messageService.getById(id);
+        message.setUpdater(getUser().getUsername());
+        messageService.updateById(message);
         boolean flag = messageService.removeById(id);
         if (!flag) {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "删除失败");

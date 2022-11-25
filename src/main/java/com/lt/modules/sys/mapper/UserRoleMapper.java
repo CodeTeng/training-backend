@@ -24,6 +24,8 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
      * 根据角色ID数组，批量删除
      */
     void deleteBatch(Long[] roleIds);
+
+    List<String> getUserRoleName(Long userId);
 }
 
 

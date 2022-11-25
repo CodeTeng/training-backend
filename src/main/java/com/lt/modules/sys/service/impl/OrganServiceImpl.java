@@ -7,22 +7,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lt.common.utils.PageUtils;
 import com.lt.common.utils.Query;
 import com.lt.modules.sys.mapper.OrganTypeMapper;
-import com.lt.modules.sys.model.entity.Config;
 import com.lt.modules.sys.model.entity.Organ;
 import com.lt.modules.sys.model.entity.OrganType;
-import com.lt.modules.sys.model.vo.OrganVO;
+import com.lt.modules.sys.model.vo.organ.OrganVO;
 import com.lt.modules.sys.service.OrganService;
 import com.lt.modules.sys.mapper.OrganMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author teng

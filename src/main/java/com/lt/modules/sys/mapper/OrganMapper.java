@@ -2,7 +2,7 @@ package com.lt.modules.sys.mapper;
 
 import com.lt.modules.sys.model.entity.Organ;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.lt.modules.sys.model.vo.OrganVO;
+import com.lt.modules.sys.model.vo.organ.OrganVO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

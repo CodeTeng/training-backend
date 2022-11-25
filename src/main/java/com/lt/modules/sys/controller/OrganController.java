@@ -9,12 +9,13 @@ import com.lt.common.utils.ResultUtils;
 import com.lt.modules.sys.model.dto.organ.OrganAddRequest;
 import com.lt.modules.sys.model.entity.Organ;
 import com.lt.modules.sys.model.entity.OrganType;
-import com.lt.modules.sys.model.vo.OrganVO;
+import com.lt.modules.sys.model.vo.organ.OrganVO;
 import com.lt.modules.sys.service.OrganService;
 import com.lt.modules.sys.service.OrganTypeService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -138,6 +139,7 @@ public class OrganController extends AbstractController {
     @SysLog("删除机构")
     @PostMapping("/delete/{organId}")
     @RequiresPermissions("sys:organ:delete")
+    @Transactional(rollbackFor = Exception.class)
     public BaseResponse delete(@PathVariable("organId") Long organId) {
         if (organId == null || organId <= 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数错误");
@@ -147,6 +149,7 @@ public class OrganController extends AbstractController {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "未查询到该机构");
         }
         organ.setUpdater(getUser().getUsername());
+        organService.updateById(organ);
         boolean flag = organService.removeById(organ);
         if (!flag) {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "删除失败");
