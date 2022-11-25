@@ -1,9 +1,8 @@
-package com.lt.modules.app.entity.dto;
+package com.lt.modules.app.model.dto;
 
 import lombok.Data;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 

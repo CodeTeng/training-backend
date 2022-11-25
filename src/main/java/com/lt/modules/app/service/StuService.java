@@ -1,6 +1,6 @@
 package com.lt.modules.app.service;
 
-import com.lt.modules.app.entity.dto.UserRegisterRequest;
+import com.lt.modules.app.model.dto.UserRegisterRequest;
 
 /**
  * @description:

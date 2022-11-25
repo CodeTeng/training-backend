@@ -3,7 +3,7 @@ package com.lt.modules.app.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lt.common.ErrorCode;
 import com.lt.common.exception.BusinessException;
-import com.lt.modules.app.entity.dto.UserRegisterRequest;
+import com.lt.modules.app.model.dto.UserRegisterRequest;
 import com.lt.modules.app.service.StuService;
 import com.lt.modules.sys.mapper.UserMapper;
 import com.lt.modules.sys.model.entity.User;
