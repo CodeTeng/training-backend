@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * @description: 图片上传
+ * @description: 图片、视频上传
  * @author: ~Teng~
  * @date: 2022/11/19 9:42
  */
@@ -24,10 +24,10 @@ public class OssController {
     private OssService ossService;
 
     /**
-     * 上传图片
+     * 上传图片或视频
      */
     @PostMapping("/upload")
-    @SysLog("上传图片")
+    @SysLog("上传图片或视频")
     @RequiresPermissions("sys:oss:all")
     public BaseResponse uploadOssFile(MultipartFile file) {
         // 获取上传文件 MultipartFile

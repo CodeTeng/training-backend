@@ -6,6 +6,8 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.region.Region;
@@ -18,7 +20,7 @@ import java.util.UUID;
 
 
 /**
- * @description:
+ * @description: 图片、视频服务类
  * @author: ~Teng~
  * @date: 2022/11/19 10:29
  */
@@ -34,6 +36,10 @@ public class OssServiceImpl implements OssService {
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.setRegion(new Region(region));
         clientConfig.setHttpProtocol(HttpProtocol.https);
+        // 设置 socket 读取超时，默认 30s
+        clientConfig.setSocketTimeout(30 * 1000);
+        // 设置建立连接超时，默认 30s
+        clientConfig.setConnectionTimeout(30 * 1000);
         // 生成 cos 客户端。
         return new COSClient(cred, clientConfig);
     }
@@ -72,10 +78,21 @@ public class OssServiceImpl implements OssService {
             // 把上传之后文件路径返回
             // 需要把上传到阿里云oss路径手动拼接出来
             // https://edu-teng-file.oss-cn-hangzhou.aliyuncs.com/avatar/avatar.png
-            return "https://" + bucketName + ".cos." + region + ".myqcloud.com/"+ fileName;
+            return "https://" + bucketName + ".cos." + region + ".myqcloud.com/" + fileName;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public void deleteObject(String key) {
+        COSClient cosClient = createCOSClient();
+        String bucketName = ConstantProperties.BUCKET_NAME;
+        try {
+            cosClient.deleteObject(bucketName, key);
+        } catch (CosClientException e) {
+            e.printStackTrace();
+        }
+        cosClient.shutdown();
     }
 }
