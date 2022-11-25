@@ -131,7 +131,6 @@ create table user_token
 )
     comment '系统用户Token';
 
-###################################再次确认########################################
 drop table if exists notice;
 -- auto-generated definition
 create table notice
@@ -240,9 +239,11 @@ create table exam
 (
     id         bigint                             not null auto_increment comment '考试id'
         primary key,
-    examName   varchar(30)                        not null comment '考试课程名称',
+    organId    bigint                             not null comment '机构id',
+    organName  varchar(64)                        null comment '机构名称',
+    examName   varchar(30)                        not null comment '考试名称',
     examDesc   varchar(255)                       null comment '考试介绍',
-    examDate   datetime                           null comment '考试时间',
+    examDate   datetime                           null comment '考试开始时间',
     totalTime  int                                not null comment '持续时间-单位为秒',
     totalScore int      default 100               not null comment '考试总分',
     passScore  int      default 60                not null comment '考试通过线',
@@ -252,101 +253,103 @@ create table exam
     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     updater    varchar(64)                        null comment '更新者',
     updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    isDelete   tinyint  default 0
+    isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
 )
     comment '考试表';
 
-drop table if exists paper;
+drop table if exists answer;
 -- auto-generated definition
-create table paper
+CREATE TABLE answer
 (
-    id         bigint                             not null auto_increment comment '试卷id'
+    id         bigint                             NOT NULL AUTO_INCREMENT COMMENT '答案id'
         primary key,
-    examId     bigint                             not null comment '考试id',
-    paperName  varchar(255)                       not null comment '试卷名称',
+    allOption  longtext                           NULL COMMENT '所有答案的信息',
+    imagesUrl  longtext                           NULL COMMENT '所有答案的图片路径',
+    analysis   longtext                           NULL COMMENT '所有答案的解析',
+    questionId bigint                             NOT NULL COMMENT '对应题目的id',
+    trueOption tinyint                            NULL COMMENT '正确的选项对应的下标',
     creator    varchar(64)                        null comment '创建者',
     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     updater    varchar(64)                        null comment '更新者',
     updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
-)
-    comment '试卷表';
+) comment '答案表';
 
-drop table if exists choice_question;
+drop table if exists question;
 -- auto-generated definition
-create table choice_question
+create table question
 (
-    id         bigint                             not null auto_increment comment '选择题题目id'
+    id           bigint                             not null auto_increment comment '题目id'
         primary key,
-    examName   varchar(30)                        not null comment '课程名称',
-    question   varchar(255)                       not null comment '题目内容',
-    answerA    varchar(255)                       not null comment '选型A',
-    answerB    varchar(255)                       not null comment '选型B',
-    answerC    varchar(255)                       not null comment '选型C',
-    answerD    varchar(255)                       not null comment '选型D',
-    answer     varchar(20)                        not null comment '正确答案',
-    analysis   varchar(255)                       null comment '题目解析',
-    score      int      default 4                 not null comment '题目分数',
+    content      text                               not null comment '题目内容',
+    type         tinyint                            not null comment '题目类型 1单选 2多选 3判断 4简答',
+    level        tinyint                            not null comment '题目难度 1简单 2中等 3困难',
+    contentImage varchar(512)                       null comment '题目内容图片 可能为看图答题',
+    bankId       bigint                             not null comment '所属题库id',
+    bankName     varchar(255)                       not null comment '所属题库名称',
+    analysis     text                               null comment '题目解析',
+    creator      varchar(64)                        null comment '创建者',
+    createTime   datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater      varchar(64)                        null comment '更新者',
+    updateTime   datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
+) comment '题目表';
+
+drop table if exists exam_question;
+-- auto-generated definition
+create table exam_question
+(
+    id          bigint                             not null auto_increment comment '主键id'
+        primary key,
+    questionIds varchar(255)                       not null comment '考试的题目id列表 以,分隔',
+    examId      bigint                             not null comment '考试id',
+    scores      varchar(255)                       not null comment '每一道题的分数 以,分隔',
+    createTime  datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete    tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
+) comment '考试题目关联表';
+
+drop table if exists question_bank;
+-- auto-generated definition
+create table question_bank
+(
+    id         bigint                             not null auto_increment comment '题库id'
+        primary key,
+    bankName   varchar(255)                       not null comment '题库名称',
+    organId    bigint                             not null comment '机构id',
+    organName  varchar(255)                       not null null comment '机构名称',
     creator    varchar(64)                        null comment '创建者',
     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     updater    varchar(64)                        null comment '更新者',
     updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
-)
-    comment '选择题题库';
+) comment '题库表';
 
-drop table if exists judge_question;
+drop table if exists exam_record;
 -- auto-generated definition
-create table judge_question
+create table exam_record
 (
-    id         bigint                             not null auto_increment comment '判断题题目id'
+    id               bigint                             not null auto_increment comment '考试记录id'
         primary key,
-    examName   varchar(30)                        not null comment '课程名称',
-    question   varchar(255)                       not null comment '题目内容',
-    answer     tinyint                            null comment '0-正确 1-错误',
-    analysis   varchar(255)                       null comment '题目解析',
-    score      int      default 2                 not null comment '题目分数',
-    creator    varchar(64)                        null comment '创建者',
-    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater    varchar(64)                        null comment '更新者',
-    updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
-)
-    comment '判断题题库';
-
-drop table if exists paper_question;
--- auto-generated definition
-create table paper_question
-(
-    id               bigint                             not null auto_increment comment 'id'
-        primary key,
-    choiceQuestionId bigint comment '选择题id',
-    judgeQuestionId  bigint comment '判断题id',
+    userId           bigint                             not null comment '学员id',
+    userAnswers      text                               not null comment '用户的答案列表',
+    creditImgUrl     varchar(512)                       null comment '考试诚信截图',
+    examId           bigint                             not null comment '考试id',
+    logicScore       int                                null comment '考试的逻辑得分(除简答)',
+    examTime         datetime                           not null comment '考试时间',
+    questionIds      varchar(150)                       not null comment '考试题目id列表',
+    totalScore       int                                null comment '考试总分(逻辑 + 简单)',
+    errorQuestionIds varchar(150)                       null comment '用户考试的错题id列表',
+    organId          bigint                             null comment '机构id',
+    organName        varchar(255)                       null comment '机构名称',
+    creator          varchar(64)                        null comment '创建者',
     createTime       datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updater          varchar(64)                        null comment '更新者',
     updateTime       datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete         tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
-)
-    comment '试卷题目关联表';
+) comment '考试记录表';
 
-drop table if exists score;
--- auto-generated definition
-create table score
-(
-    id         bigint                             not null auto_increment comment '成绩id'
-        primary key,
-    examId     bigint                             not null comment '考试id',
-    userId     bigint                             not null comment '用户id',
-    examName   bigint                             not null comment '考试名称',
-    finalScore int                                not null comment '总成绩',
-    answerTime varchar(20) comment '答题时间',
-    creator    varchar(64)                        null comment '创建者',
-    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
-    updater    varchar(64)                        null comment '更新者',
-    updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
-)
-    comment '成绩表';
-
+###################################再次确认########################################
 drop table if exists video;
 -- auto-generated definition
 create table video
@@ -423,3 +426,94 @@ create table config
 )
     comment '系统配置信息表';
 
+
+# drop table if exists paper;
+# -- auto-generated definition
+# create table paper
+# (
+#     id         bigint                             not null auto_increment comment '试卷id'
+#         primary key,
+#     examId     bigint                             not null comment '考试id',
+#     paperName  varchar(255)                       not null comment '试卷名称',
+#     creator    varchar(64)                        null comment '创建者',
+#     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+#     updater    varchar(64)                        null comment '更新者',
+#     updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+#     isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
+# )
+#     comment '试卷表';
+#
+# drop table if exists choice_question;
+# -- auto-generated definition
+# create table choice_question
+# (
+#     id         bigint                             not null auto_increment comment '选择题题目id'
+#         primary key,
+#     examName   varchar(30)                        not null comment '课程名称',
+#     question   varchar(255)                       not null comment '题目内容',
+#     answerA    varchar(255)                       not null comment '选型A',
+#     answerB    varchar(255)                       not null comment '选型B',
+#     answerC    varchar(255)                       not null comment '选型C',
+#     answerD    varchar(255)                       not null comment '选型D',
+#     answer     varchar(20)                        not null comment '正确答案',
+#     analysis   varchar(255)                       null comment '题目解析',
+#     score      int      default 4                 not null comment '题目分数',
+#     creator    varchar(64)                        null comment '创建者',
+#     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+#     updater    varchar(64)                        null comment '更新者',
+#     updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+#     isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
+# )
+#     comment '选择题题库';
+#
+# drop table if exists judge_question;
+# -- auto-generated definition
+# create table judge_question
+# (
+#     id         bigint                             not null auto_increment comment '判断题题目id'
+#         primary key,
+#     examName   varchar(30)                        not null comment '课程名称',
+#     question   varchar(255)                       not null comment '题目内容',
+#     answer     tinyint                            null comment '0-正确 1-错误',
+#     analysis   varchar(255)                       null comment '题目解析',
+#     score      int      default 2                 not null comment '题目分数',
+#     creator    varchar(64)                        null comment '创建者',
+#     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+#     updater    varchar(64)                        null comment '更新者',
+#     updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+#     isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
+# )
+#     comment '判断题题库';
+#
+# drop table if exists paper_question;
+# -- auto-generated definition
+# create table paper_question
+# (
+#     id               bigint                             not null auto_increment comment 'id'
+#         primary key,
+#     choiceQuestionId bigint comment '选择题id',
+#     judgeQuestionId  bigint comment '判断题id',
+#     createTime       datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+#     updateTime       datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+#     isDelete         tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
+# )
+#     comment '试卷题目关联表';
+#
+# drop table if exists score;
+# -- auto-generated definition
+# create table score
+# (
+#     id         bigint                             not null auto_increment comment '成绩id'
+#         primary key,
+#     examId     bigint                             not null comment '考试id',
+#     userId     bigint                             not null comment '用户id',
+#     examName   bigint                             not null comment '考试名称',
+#     finalScore int                                not null comment '总成绩',
+#     answerTime varchar(20) comment '答题时间',
+#     creator    varchar(64)                        null comment '创建者',
+#     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+#     updater    varchar(64)                        null comment '更新者',
+#     updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+#     isDelete   tinyint  default 0                 not null comment '是否删除 0-不删除 1-删除'
+# )
+#     comment '成绩表';
