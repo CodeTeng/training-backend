@@ -8,14 +8,24 @@ import com.lt.common.ErrorCode;
 import com.lt.common.exception.BusinessException;
 import com.lt.common.utils.ResultUtils;
 import com.lt.modules.app.model.dto.UserRegisterRequest;
+import com.lt.modules.sys.model.entity.Exam;
 import com.lt.modules.sys.model.entity.ExamRecord;
+import com.lt.modules.sys.model.vo.exam.ExamStateVO;
 import com.lt.modules.sys.service.ExamRecordService;
 import com.lt.modules.app.service.StuService;
 import com.lt.modules.sys.controller.AbstractController;
 import com.lt.modules.sys.model.entity.User;
+import com.lt.modules.sys.service.ExamService;
+import com.lt.modules.sys.service.UserService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: 学员前台管理
@@ -31,6 +41,9 @@ public class StuController extends AbstractController {
 
     @Autowired
     private ExamRecordService examRecordService;
+
+    @Autowired
+    private ExamService examService;
 
     /**
      * 用户注册---需要管理员审核通过后才算真正注册成功
@@ -54,21 +67,29 @@ public class StuController extends AbstractController {
     }
 
     /**
-     * 获取学员个人成绩（分页 可根据考试名查询）
+     * 获取学员个人成绩
      */
     @GetMapping("/getMyGrade")
-    public BaseResponse getMyGrade(Integer pageNo, Integer pageSize,
-                                   @RequestParam(required = false) Long examId) {
-        User user = getUser();
-        IPage<ExamRecord> examRecordIPage = new Page<>(pageNo, pageSize);
-        QueryWrapper<ExamRecord> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userId", user.getCreator());
-        if (examId != null) {
-            queryWrapper.eq("examId", examId);
+    @RequiresPermissions("app:record:all")
+    public BaseResponse getMyGrade(Long examId) {
+        if (examId == null || examId <= 0) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
         }
-        IPage<ExamRecord> page = examRecordService.page(examRecordIPage, queryWrapper);
-        return ResultUtils.success(page);
+        QueryWrapper<ExamRecord> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", getUserId());
+        queryWrapper.eq("examId", examId);
+        List<ExamRecord> list = examRecordService.list(queryWrapper);
+        return ResultUtils.success(list);
     }
 
-
+    /**
+     * 查询本人的所有考试信息
+     */
+    @GetMapping("/getMyExamInfo")
+    @RequiresPermissions("app:exam:all")
+    public BaseResponse getMyExamInfo() {
+        Long userId = getUserId();
+        List<Exam> exams = examService.getMyExamInfo(userId);
+        return ResultUtils.success(exams);
+    }
 }

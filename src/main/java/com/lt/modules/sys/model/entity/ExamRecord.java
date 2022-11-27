@@ -28,7 +28,7 @@ public class ExamRecord implements Serializable {
     private Long userId;
 
     /**
-     * 用户的答案列表
+     * 用户的答案列表 多个以-分隔 不能用,有多选题
      */
     private String userAnswers;
 
@@ -48,12 +48,12 @@ public class ExamRecord implements Serializable {
     private Integer logicScore;
 
     /**
-     * 考试时间
+     * 考生作答时间
      */
     private Date examTime;
 
     /**
-     * 考试题目id列表
+     * 考试题目id列表 多个以,分隔
      */
     private String questionIds;
 

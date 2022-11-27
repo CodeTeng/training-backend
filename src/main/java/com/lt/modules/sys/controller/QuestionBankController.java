@@ -14,6 +14,7 @@ import com.lt.modules.sys.service.QuestionBankService;
 import com.lt.modules.sys.model.entity.Organ;
 import com.lt.modules.sys.service.OrganService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,7 @@ public class QuestionBankController extends AbstractController {
      * 获取所有题库信息
      */
     @GetMapping("/getQuestionBank")
+    @RequiresPermissions("sys:bank:list")
     public BaseResponse getQuestionBank() {
         List<QuestionBank> list = questionBankService.list();
         return ResultUtils.success(list);
@@ -48,6 +50,7 @@ public class QuestionBankController extends AbstractController {
      * 获取题库中所有题目类型的数量
      */
     @GetMapping("/getBankHaveQuestionSumByType")
+    @RequiresPermissions("sys:bank:list")
     public BaseResponse getBankHaveQuestionSumByType(Integer pageNo, Integer pageSize,
                                                      @RequestParam(required = false) String bankName,
                                                      @RequestParam(required = false) Long organId) {
@@ -62,6 +65,7 @@ public class QuestionBankController extends AbstractController {
      * 根据题库id获取题库信息
      */
     @GetMapping("/getQuestionById/{bankId}")
+    @RequiresPermissions("sys:bank:list")
     public BaseResponse getQuestionById(@PathVariable("bankId") Long bankId) {
         if (bankId == null || bankId <= 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
@@ -74,6 +78,7 @@ public class QuestionBankController extends AbstractController {
      * 根据题库获取所有的题目信息(单选,多选,判断题)
      */
     @GetMapping("/getQuestionByBank")
+    @RequiresPermissions("sys:bank:list")
     public BaseResponse getQuestionByBank(Long bankId) {
         if (bankId == null || bankId <= 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
@@ -84,6 +89,7 @@ public class QuestionBankController extends AbstractController {
 
     @PostMapping("/addQuestionBank")
     @SysLog("添加题库")
+    @RequiresPermissions("sys:bank:save")
     public BaseResponse addQuestionBank(@RequestBody @Validated AddBankRequest addBankRequest) {
         String bankName = addBankRequest.getBankName();
         String organName = addBankRequest.getOrganName();
@@ -109,6 +115,7 @@ public class QuestionBankController extends AbstractController {
 
     @PostMapping("/updateQuestionBank")
     @SysLog("修改题库")
+    @RequiresPermissions("sys:bank:update")
     public BaseResponse updateQuestionBank(@RequestBody QuestionBank questionBank) {
         String bankName = questionBank.getBankName();
         String organName = questionBank.getOrganName();

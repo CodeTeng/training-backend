@@ -9,19 +9,21 @@ import com.lt.common.annotation.SysLog;
 import com.lt.common.utils.DateUtils;
 import com.lt.common.utils.ResultUtils;
 import com.lt.modules.sys.model.dto.exam.AddExamByQuestionListRequest;
-import com.lt.modules.sys.model.entity.Exam;
-import com.lt.modules.sys.model.entity.ExamQuestion;
-import com.lt.modules.sys.model.entity.Organ;
-import com.lt.modules.sys.model.entity.User;
+import com.lt.modules.sys.model.entity.*;
+import com.lt.modules.sys.model.vo.exam.ExamStateVO;
 import com.lt.modules.sys.service.ExamQuestionService;
+import com.lt.modules.sys.service.ExamRecordService;
 import com.lt.modules.sys.service.ExamService;
 import com.lt.modules.sys.service.OrganService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @description: 考试管理
@@ -41,10 +43,14 @@ public class ExamController extends AbstractController {
     @Autowired
     private ExamQuestionService examQuestionService;
 
+    @Autowired
+    private ExamRecordService examRecordService;
+
     /**
      * 获取考试信息
      */
     @GetMapping("/getExamInfo")
+    @RequiresPermissions("sys:exam:list")
     public BaseResponse getExamInfo(Integer pageNo, Integer pageSize,
                                     @RequestParam(required = false) String examName,
                                     @RequestParam(required = false) String startTime,
@@ -58,9 +64,49 @@ public class ExamController extends AbstractController {
     }
 
     /**
+     * 获取个人考试的信息 在线考试界面
+     */
+    @GetMapping("/getAllExamInfo")
+    @RequiresPermissions("app:exam:all")
+    public BaseResponse getAllExamInfo(Integer pageNo, Integer pageSize,
+                                       @RequestParam(required = false) String examName,
+                                       @RequestParam(required = false) String startTime,
+                                       @RequestParam(required = false) String endTime,
+                                       @RequestParam(required = false) Long organId) {
+        if (pageNo == null || pageNo <= 0 || pageSize == null || pageSize <= 0) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
+        }
+        Page<Exam> page = examService.getExamInfo(pageNo, pageSize, examName, startTime, endTime, organId);
+        List<Exam> exams = page.getRecords();
+        Page<ExamStateVO> resPage = new Page<>();
+        BeanUtils.copyProperties(page, resPage);
+        if (exams == null || exams.size() == 0) {
+            resPage.setRecords(new ArrayList<>());
+            return ResultUtils.success(resPage);
+        }
+        List<ExamRecord> examRecordList = examRecordService.list(new QueryWrapper<ExamRecord>().eq("userId", getUserId()));
+        List<ExamStateVO> examStateVOList = exams.stream().map(exam -> {
+            List<Long> examIdList = examRecordList.stream().map(ExamRecord::getExamId).toList();
+            ExamStateVO examStateVO = new ExamStateVO();
+            BeanUtils.copyProperties(exam, examStateVO);
+            if (examIdList.contains(exam.getId())) {
+                // 考试通过
+                examStateVO.setFlag(true);
+            } else {
+                // 考试未过
+                examStateVO.setFlag(false);
+            }
+            return examStateVO;
+        }).toList();
+        resPage.setRecords(examStateVOList);
+        return ResultUtils.success(resPage);
+    }
+
+    /**
      * 根据考试id获取考试信息
      */
     @GetMapping("/getExamInfoById/{examId}")
+    @RequiresPermissions("sys:exam:list")
     public BaseResponse getExamInfoById(@PathVariable("examId") Long examId) {
         if (examId == null || examId <= 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
@@ -76,8 +122,25 @@ public class ExamController extends AbstractController {
         return ResultUtils.success(ExamVO);
     }
 
+    /**
+     * 根据考试id查询考试中的每一道题目id和分值
+     */
+    @GetMapping("/getExamQuestionByExamId/{examId}")
+    @RequiresPermissions("sys:exam:list")
+    public BaseResponse getExamQuestionByExamId(@PathVariable("examId") Long examId) {
+        if (examId == null || examId <= 0) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
+        }
+        ExamQuestion examQuestion = examQuestionService.getOne(new QueryWrapper<ExamQuestion>().eq("examId", examId));
+        if (examQuestion == null) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "查询失败");
+        }
+        return ResultUtils.success(examQuestion);
+    }
+
     @SysLog("根据题目列表添加考试")
     @PostMapping("/addExamByQuestionList")
+    @RequiresPermissions("sys:exam:save")
     public BaseResponse addExamByQuestionList(@RequestBody AddExamByQuestionListRequest addExamByQuestionListRequest) {
         addExamByQuestionListRequest.setCreator(getUser().getUsername());
         String examName = addExamByQuestionListRequest.getExamName();
@@ -117,6 +180,7 @@ public class ExamController extends AbstractController {
 
     @SysLog("更新考试信息")
     @PostMapping("/updateExamInfo")
+    @RequiresPermissions("sys:exam:update")
     public BaseResponse updateExamInfo(@RequestBody AddExamByQuestionListRequest addExamByQuestionListRequest) {
         // 数据校验
         String examName = addExamByQuestionListRequest.getExamName();

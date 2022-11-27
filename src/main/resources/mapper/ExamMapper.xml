@@ -32,4 +32,12 @@
         createTime,updater,updateTime,
         isDelete
     </sql>
+
+    <!--List<Exam> getMyExamInfo(Long userId);-->
+    <select id="getMyExamInfo" resultType="com.lt.modules.sys.model.entity.Exam">
+        select e.*
+        from exam e
+                 left join exam_record er on e.id = er.examId
+        where er.userId = #{userId}
+    </select>
 </mapper>

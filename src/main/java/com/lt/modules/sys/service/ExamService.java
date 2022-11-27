@@ -6,6 +6,7 @@ import com.lt.modules.sys.model.entity.Exam;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author teng
@@ -19,4 +20,6 @@ public interface ExamService extends IService<Exam> {
     void addExamByQuestionList(AddExamByQuestionListRequest addExamByQuestionListRequest);
 
     void updateExamInfo(AddExamByQuestionListRequest addExamByQuestionListRequest);
+
+    List<Exam> getMyExamInfo(Long userId);
 }

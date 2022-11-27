@@ -11,8 +11,10 @@ import com.lt.modules.sys.model.dto.question.QuestionRequest;
 import com.lt.modules.sys.model.entity.Answer;
 import com.lt.modules.sys.model.entity.Question;
 import com.lt.modules.sys.service.AnswerService;
+import com.lt.modules.sys.service.QuestionBankService;
 import com.lt.modules.sys.service.QuestionService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @description:
@@ -36,10 +39,14 @@ public class QuestionController extends AbstractController {
     @Autowired
     private AnswerService answerService;
 
+    @Autowired
+    private QuestionBankService questionBankService;
+
     /**
      * 获取所有题目信息
      */
     @GetMapping("/getQuestion")
+    @RequiresPermissions("sys:question:list")
     public BaseResponse getQuestion(Integer pageNo, Integer pageSize,
                                     @RequestParam(required = false) Integer questionType,
                                     @RequestParam(required = false) Integer questionBankId,
@@ -55,6 +62,7 @@ public class QuestionController extends AbstractController {
      * 根据id获取题目信息
      */
     @GetMapping("/getQuestionById/{questionId}")
+    @RequiresPermissions("sys:question:list")
     public BaseResponse getQuestionById(@PathVariable("questionId") Long questionId) {
         if (questionId == null || questionId <= 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
@@ -63,8 +71,26 @@ public class QuestionController extends AbstractController {
         return ResultUtils.success(questionVO);
     }
 
+    /**
+     * 根据题库id和题目类型获取题目信息 type(1单选 2多选 3判断)
+     */
+    @GetMapping("/getQuestionByBankIdAndType")
+    @RequiresPermissions("sys:question:list")
+    public BaseResponse getQuestionByBankIdAndType(Long bankId, Integer type) {
+        if (bankId == null || bankId <= 0 || type == null) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
+        }
+        if (type != 1 && type != 2 && type != 3) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
+        }
+        List<QuestionRequest> questionVos = questionBankService.getQuestionInfoByBank(bankId);
+        questionVos.removeIf(questionRequest -> !Objects.equals(questionRequest.getType(), type));
+        return ResultUtils.success(questionVos);
+    }
+
     @PostMapping("/addQuestion")
     @SysLog("添加题目信息")
+    @RequiresPermissions("sys:question:save")
     public BaseResponse addQuestion(@RequestBody QuestionRequest questionRequest) {
         Integer type = questionRequest.getType();
         Integer level = questionRequest.getLevel();
@@ -112,6 +138,7 @@ public class QuestionController extends AbstractController {
 
     @SysLog("修改试题信息")
     @PostMapping("/updateQuestion")
+    @RequiresPermissions("sys:question:update")
     public BaseResponse updateQuestion(@RequestBody QuestionRequest questionRequest) {
         Integer type = questionRequest.getType();
         Integer level = questionRequest.getLevel();
@@ -161,6 +188,7 @@ public class QuestionController extends AbstractController {
      * 批量删除题目 多个以,分隔
      */
     @PostMapping("/deleteQuestion")
+    @RequiresPermissions("sys:question:delete")
     @SysLog("删除题目")
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse deleteQuestion(String questionIds) {
@@ -179,6 +207,7 @@ public class QuestionController extends AbstractController {
 
     @PostMapping("/addQuestionToBank")
     @SysLog("增加题库中的题目")
+    @RequiresPermissions("sys:question:update")
     public BaseResponse addQuestionToBank(String questionIds, String bankIds) {
         if (StringUtils.isAnyBlank(questionIds, bankIds)) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
@@ -192,6 +221,7 @@ public class QuestionController extends AbstractController {
 
     @PostMapping("/removeQuestionFromBank")
     @SysLog("从题库中移除题目")
+    @RequiresPermissions("sys:question:update")
     public BaseResponse removeQuestionFromBank(String questionIds, String bankIds) {
         if (StringUtils.isAnyBlank(questionIds, bankIds)) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
@@ -207,6 +237,7 @@ public class QuestionController extends AbstractController {
      * 根据题目id集合获取题目和答案信息
      */
     @GetMapping("/getQuestionAndAnswerByIds")
+    @RequiresPermissions("sys:question:list")
     public BaseResponse getQuestionAndAnswerByIds(String ids) {
         if (StringUtils.isAnyBlank(ids)) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");

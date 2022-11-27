@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author teng
@@ -29,6 +30,9 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam>
 
     @Autowired
     private ExamQuestionService examQuestionService;
+
+    @Autowired
+    private ExamMapper examMapper;
 
     @Override
     public Page<Exam> getExamInfo(Integer pageNo, Integer pageSize, String examName, String startTime, String endTime, Long organId) {
@@ -70,6 +74,11 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam>
         examQuestion.setQuestionIds(addExamByQuestionListRequest.getQuestionIds());
         examQuestion.setScores(addExamByQuestionListRequest.getScores());
         examQuestionService.update(examQuestion, new UpdateWrapper<ExamQuestion>().eq("examId", exam.getId()));
+    }
+
+    @Override
+    public List<Exam> getMyExamInfo(Long userId) {
+        return examMapper.getMyExamInfo(userId);
     }
 }
 
