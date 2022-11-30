@@ -5,16 +5,17 @@
 <mapper namespace="com.lt.modules.sys.mapper.MessageUserMapper">
 
     <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.MessageUser">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="messageId" column="messageId" jdbcType="BIGINT"/>
-            <result property="userId" column="userId" jdbcType="BIGINT"/>
-            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
-            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="messageId" column="messageId" jdbcType="BIGINT"/>
+        <result property="userId" column="userId" jdbcType="BIGINT"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+        <result property="isRead" column="isRead" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,messageId,userId,
-        createTime,updateTime,isDelete
+        createTime,updateTime,isDelete,isRead
     </sql>
 </mapper>

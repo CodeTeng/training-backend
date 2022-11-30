@@ -9,6 +9,7 @@ import com.lt.modules.sys.model.entity.User;
 import com.lt.modules.sys.service.CaptchaService;
 import com.lt.modules.sys.service.UserService;
 import com.lt.modules.sys.service.UserTokenService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,17 +60,24 @@ public class LoginController extends AbstractController {
     /**
      * 系统登录
      */
-    @PostMapping("/sys/login")
-    public BaseResponse login(@RequestBody @Validated UserLoginRequest userLoginRequest) throws IOException {
+    @PostMapping("/login")
+    public BaseResponse login(@RequestBody @Validated UserLoginRequest userLoginRequest) {
+        String captcha = userLoginRequest.getCaptcha();
+        String username = userLoginRequest.getUsername();
+        String uuid = userLoginRequest.getUuid();
+        String password = userLoginRequest.getPassword();
+        if (StringUtils.isAnyBlank(username, password, uuid, captcha)) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请输入完整登录信息");
+        }
         // 1. 验证码校验
-        boolean captcha = captchaService.validate(userLoginRequest.getUuid(), userLoginRequest.getCaptcha());
-        if (!captcha) {
+        boolean flag = captchaService.validate(uuid, captcha);
+        if (!flag) {
             return ResultUtils.error(ErrorCode.CAPTCHA_ERROR, "验证码错误");
         }
         // 2. 用户信息
-        User user = userService.queryByUserName(userLoginRequest.getUsername());
+        User user = userService.queryByUserName(username);
         // 账号不存在、密码错误
-        if (user == null || !user.getPassword().equals(new Sha256Hash(userLoginRequest.getPassword()).toHex())) {
+        if (user == null || !user.getPassword().equals(new Sha256Hash(password).toHex())) {
             return ResultUtils.error(ErrorCode.LOGIN_ERROR, "账号或密码错误");
         }
         // 账号锁定
@@ -84,11 +92,15 @@ public class LoginController extends AbstractController {
         return ResultUtils.success(tokenMap);
     }
 
-    @PostMapping("/sys/logout")
+    @PostMapping("/logout")
     @SysLog("退出系统")
     public BaseResponse logout() {
-        userTokenService.logout(getUserId());
-        return ResultUtils.success(true);
+        Long userId = getUserId();
+        if (userId == null) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "非法退出");
+        }
+        userTokenService.logout(userId);
+        return ResultUtils.success("退出成功");
     }
 
     public static void main(String[] args) {

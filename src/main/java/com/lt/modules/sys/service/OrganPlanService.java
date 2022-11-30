@@ -1,5 +1,6 @@
 package com.lt.modules.sys.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lt.common.utils.PageUtils;
 import com.lt.modules.sys.model.entity.OrganPlan;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -20,4 +21,6 @@ public interface OrganPlanService extends IService<OrganPlan> {
      * 根据机构id查看该机构的所有培训计划
      */
     List<OrganPlanVO> getOrganPlanInfo(Long organId);
+
+//    Page<OrganPlanVO> getAllOrganPlanByPage(Integer pageNo, Integer pageSize, Integer lowTime, Integer highTime, String startTime, String endTime);
 }

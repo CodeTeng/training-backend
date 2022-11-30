@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 系统用户接口
@@ -59,7 +60,7 @@ public class UserController extends AbstractController {
     }
 
     /**
-     * 获取登录的用户信息
+     * 获取当前用户信息
      */
     @GetMapping("/info")
     public BaseResponse info() {
@@ -84,9 +85,12 @@ public class UserController extends AbstractController {
     @SysLog("修改密码")
     @PostMapping("/password")
     @RequiresPermissions("sys:user:update")
-    public BaseResponse password(@RequestBody @Validated UserPasswordRequest userPasswordRequest) {
+    public BaseResponse password(@RequestBody UserPasswordRequest userPasswordRequest) {
         String password = userPasswordRequest.getPassword();
         String newPassword = userPasswordRequest.getNewPassword();
+        if (StringUtils.isAnyBlank(password, newPassword)) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "密码不能为空");
+        }
         if (password.length() < 6 || newPassword.length() < 6) {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "密码最短为6位");
         }
@@ -102,7 +106,7 @@ public class UserController extends AbstractController {
         if (!flag) {
             return ResultUtils.error(ErrorCode.UPDATE_ERROR, "密码错误");
         }
-        return ResultUtils.success(flag);
+        return ResultUtils.success("更新密码成功");
     }
 
     /**
@@ -169,15 +173,38 @@ public class UserController extends AbstractController {
     }
 
     /**
-     * 修改用户
+     * 修改用户信息
      */
     @SysLog("修改用户")
     @PostMapping("/update")
     @RequiresPermissions("sys:user:update")
-    public BaseResponse update(@RequestBody @Validated UserUpdateRequest userUpdateRequest) {
+    public BaseResponse update(@RequestBody UserUpdateRequest userUpdateRequest) {
+        String username = userUpdateRequest.getUsername();
+        String nickname = userUpdateRequest.getNickname();
+        String avatar = userUpdateRequest.getAvatar();
+        String mobile = userUpdateRequest.getMobile();
+        if (StringUtils.isAnyBlank(username, nickname, avatar, mobile)) {
+            return ResultUtils.error(ErrorCode.OPERATION_ERROR, "请填写完整信息");
+        }
+        Integer sex = userUpdateRequest.getSex();
+        Integer status = userUpdateRequest.getStatus();
+        if (sex == null || status == null) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请填写完整信息");
+        }
+        List<Long> roleIdList = userUpdateRequest.getRoleIdList();
+        if (roleIdList == null || roleIdList.size() < 1) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "必须添加用户角色");
+        }
+        String email = userUpdateRequest.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            boolean isMatch = Pattern.matches("^(\\w+([-.][A-Za-z0-9]+)*){3,18}@\\w+([-.][A-Za-z0-9]+)*\\.\\w+([-.][A-Za-z0-9]+)*$", email);
+            if (!isMatch) {
+                return ResultUtils.error(ErrorCode.PARAMS_ERROR, "邮箱格式错误");
+            }
+        }
         userUpdateRequest.setUpdater(getUser().getUsername());
         userService.update(userUpdateRequest);
-        return ResultUtils.success(true);
+        return ResultUtils.success("修改成功");
     }
 
     /**

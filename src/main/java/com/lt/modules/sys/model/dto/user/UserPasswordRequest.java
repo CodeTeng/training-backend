@@ -16,12 +16,10 @@ public class UserPasswordRequest implements Serializable {
     /**
      * 原密码
      */
-    @NotBlank(message = "密码不能为空")
     private String password;
 
     /**
      * 新密码
      */
-    @NotBlank(message = "密码不能为空")
     private String newPassword;
 }

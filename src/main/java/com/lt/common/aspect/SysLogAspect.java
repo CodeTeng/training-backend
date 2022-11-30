@@ -1,6 +1,5 @@
 package com.lt.common.aspect;
 
-import cn.hutool.core.net.Ipv4Util;
 import com.google.gson.Gson;
 import com.lt.common.annotation.SysLog;
 import com.lt.common.utils.HttpContextUtils;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Date;
 
 /**
  * @description: 系统日志，切面处理类

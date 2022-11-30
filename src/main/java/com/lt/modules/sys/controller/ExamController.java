@@ -43,9 +43,6 @@ public class ExamController extends AbstractController {
     @Autowired
     private ExamQuestionService examQuestionService;
 
-    @Autowired
-    private ExamRecordService examRecordService;
-
     /**
      * 获取考试信息
      */
@@ -61,45 +58,6 @@ public class ExamController extends AbstractController {
         }
         Page<Exam> page = examService.getExamInfo(pageNo, pageSize, examName, startTime, endTime, organId);
         return ResultUtils.success(page);
-    }
-
-    /**
-     * 获取个人考试的信息 在线考试界面
-     */
-    @GetMapping("/getAllExamInfo")
-    @RequiresPermissions("app:exam:all")
-    public BaseResponse getAllExamInfo(Integer pageNo, Integer pageSize,
-                                       @RequestParam(required = false) String examName,
-                                       @RequestParam(required = false) String startTime,
-                                       @RequestParam(required = false) String endTime,
-                                       @RequestParam(required = false) Long organId) {
-        if (pageNo == null || pageNo <= 0 || pageSize == null || pageSize <= 0) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
-        }
-        Page<Exam> page = examService.getExamInfo(pageNo, pageSize, examName, startTime, endTime, organId);
-        List<Exam> exams = page.getRecords();
-        Page<ExamStateVO> resPage = new Page<>();
-        BeanUtils.copyProperties(page, resPage);
-        if (exams == null || exams.size() == 0) {
-            resPage.setRecords(new ArrayList<>());
-            return ResultUtils.success(resPage);
-        }
-        List<ExamRecord> examRecordList = examRecordService.list(new QueryWrapper<ExamRecord>().eq("userId", getUserId()));
-        List<ExamStateVO> examStateVOList = exams.stream().map(exam -> {
-            List<Long> examIdList = examRecordList.stream().map(ExamRecord::getExamId).toList();
-            ExamStateVO examStateVO = new ExamStateVO();
-            BeanUtils.copyProperties(exam, examStateVO);
-            if (examIdList.contains(exam.getId())) {
-                // 考试通过
-                examStateVO.setFlag(true);
-            } else {
-                // 考试未过
-                examStateVO.setFlag(false);
-            }
-            return examStateVO;
-        }).toList();
-        resPage.setRecords(examStateVOList);
-        return ResultUtils.success(resPage);
     }
 
     /**

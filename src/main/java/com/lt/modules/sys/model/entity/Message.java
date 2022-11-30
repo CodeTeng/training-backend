@@ -7,8 +7,6 @@ import java.util.Date;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-
 /**
  * 消息表
  *
@@ -27,13 +25,11 @@ public class Message implements Serializable {
     /**
      * 消息标题
      */
-    @NotBlank(message = "消息标题不能为空")
     private String title;
 
     /**
      * 消息内容
      */
-    @NotBlank(message = "消息内容不能为空")
     private String content;
 
     /**

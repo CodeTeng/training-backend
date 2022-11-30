@@ -148,38 +148,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public void update(UserUpdateRequest userUpdateRequest) {
         User user = new User();
         BeanUtils.copyProperties(userUpdateRequest, user);
-        String organName = userUpdateRequest.getOrganName();
-        Organ organ = organService.getOne(new QueryWrapper<Organ>().eq(StringUtils.isNotBlank(organName), "name", organName));
+        Organ organ = organService.getById(userUpdateRequest.getOrganId());
         if (organ == null) {
             user.setOrganId(null);
         } else {
             user.setOrganId(organ.getId());
         }
-        String roleName = userUpdateRequest.getRoleName();
-        List<String> roleNameList = Arrays.stream(StringUtils.split(roleName, ",")).toList();
-        List<Long> roleIdList = roleNameList.stream().map(name -> {
-            Role role = roleService.getOne(new QueryWrapper<Role>().eq("name", name));
-            return role.getId();
-        }).toList();
-        user.setRoleIdList(roleIdList);
-        String sexName = userUpdateRequest.getSexName();
-        Integer sex = null;
-        if ("男".equals(sexName)) {
-            sex = 0;
-        } else if ("女".equals(sexName)) {
-            sex = 1;
-        }
-        user.setSex(sex);
-        Integer status = null;
-        String statusName = userUpdateRequest.getStatusName();
-        if ("正常".equals(statusName)) {
-            status = 0;
-        } else if ("停用".equals(statusName)) {
-            status = 1;
-        } else if ("审核".equals(statusName)) {
-            status = 2;
-        }
-        user.setStatus(status);
         this.updateById(user);
         // 检查角色是否越权
         checkRole(user);

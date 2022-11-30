@@ -114,22 +114,6 @@ public class ExamRecordController extends AbstractController {
         return ResultUtils.success("批阅成功");
     }
 
-    /**
-     * 获取学员个人成绩（分页 可根据考试名查询）
-     */
-//    @GetMapping("/getMyGrade")
-//    @RequiresPermissions("sys:record:list")
-//    public BaseResponse getMyGrade(Integer pageNo, Integer pageSize,
-//                                   @RequestParam(required = false) Long examId) {
-//        IPage<ExamRecord> examRecordIPage = new Page<>(pageNo, pageSize);
-//        QueryWrapper<ExamRecord> queryWrapper = new QueryWrapper<>();
-//        if (examId != null) {
-//            queryWrapper.eq("examId", examId);
-//        }
-//        IPage<ExamRecord> page = examRecordService.page(examRecordIPage, queryWrapper);
-//        return ResultUtils.success(page);
-//    }
-
     @SysLog("保存考试记录")
     @PostMapping("/addExamRecord")
     @RequiresPermissions("sys:record:save")

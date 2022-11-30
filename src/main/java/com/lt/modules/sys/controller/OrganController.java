@@ -47,7 +47,6 @@ public class OrganController extends AbstractController {
         return ResultUtils.success(page);
     }
 
-
     /**
      * 根据机构类型id 获取该类型下的所有机构
      */

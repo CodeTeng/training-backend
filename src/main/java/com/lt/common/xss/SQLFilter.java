@@ -37,7 +37,6 @@ public class SQLFilter {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "包含非法字符");
             }
         }
-
         return str;
     }
 }

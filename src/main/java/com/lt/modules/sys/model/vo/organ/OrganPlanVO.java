@@ -13,6 +13,9 @@ import java.util.Date;
 @Data
 public class OrganPlanVO implements Serializable {
 
+    /**
+     * 培训计划id
+     */
     private Long id;
 
     /**
@@ -39,26 +42,6 @@ public class OrganPlanVO implements Serializable {
      * 培训结束时间 开始时间+培训周期
      */
     private Date endTime;
-
-    /**
-     * 创建者
-     */
-    private String creator;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新者
-     */
-    private String updater;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
 
     private static final long serialVersionUID = 1L;
 }

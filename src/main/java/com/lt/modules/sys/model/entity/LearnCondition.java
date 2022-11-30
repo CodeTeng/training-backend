@@ -7,17 +7,15 @@ import java.util.Date;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-
 /**
- * 学员消息关联表
+ * 学习情况表
  *
  * @author teng
- * @TableName message_user
+ * @TableName learn_condition
  */
-@TableName(value = "message_user")
+@TableName(value = "learn_condition")
 @Data
-public class MessageUser implements Serializable {
+public class LearnCondition implements Serializable {
     /**
      * id
      */
@@ -25,26 +23,44 @@ public class MessageUser implements Serializable {
     private Long id;
 
     /**
-     * 消息id
-     */
-    @NotBlank(message = "消息id不能为空")
-    private Long messageId;
-
-    /**
      * 学员id
      */
-    @NotBlank(message = "学员id不能为空")
     private Long userId;
 
     /**
-     * 是否已读 0-未读 1-已读
+     * 视频id
      */
-    private Integer isRead;
+    private Long videoId;
+
+    /**
+     * 是否完成 0-未完成 1-完成
+     */
+    private Integer isDone;
+
+    /**
+     * 完成时间
+     */
+    private Date doneTime;
+
+    /**
+     * 视频观看完成度
+     */
+    private Integer complete;
+
+    /**
+     * 创建者
+     */
+    private String creator;
 
     /**
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 更新者
+     */
+    private String updater;
 
     /**
      * 更新时间

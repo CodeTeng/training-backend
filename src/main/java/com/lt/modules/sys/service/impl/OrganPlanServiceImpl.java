@@ -13,6 +13,7 @@ import com.lt.modules.sys.model.entity.OrganPlan;
 import com.lt.modules.sys.model.vo.organ.OrganPlanVO;
 import com.lt.modules.sys.service.OrganPlanService;
 import com.lt.modules.sys.mapper.OrganPlanMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,25 @@ public class OrganPlanServiceImpl extends ServiceImpl<OrganPlanMapper, OrganPlan
         resPage.setRecords(organPlanVOList);
         return new PageUtils(resPage);
     }
+
+//    @Override
+//    public Page<OrganPlanVO> getAllOrganPlanByPage(Integer pageNo, Integer pageSize, Integer lowTime, Integer highTime, String startTime, String endTime) {
+//        // 培训周期 最少几天 最多几天
+//        if (lowTime != null && highTime != null && (lowTime < 0 || highTime < 0 || highTime < lowTime)) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+//        }
+//        // 开始时间 结束时间
+//        QueryWrapper<OrganPlan> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.ge(lowTime != null, "trainPeriod", lowTime);
+//        queryWrapper.le(highTime != null, "trainPeriod", highTime);
+//        queryWrapper.ge(StringUtils.isNotBlank(startTime), "startTime", startTime);
+//        queryWrapper.le(StringUtils.isNotBlank(endTime), "eneTime", endTime);
+//        this.page(
+//                new Page<>(pageNo, pageSize),
+//
+//                )
+//        return null;
+//    }
 
     @Override
     public List<OrganPlanVO> getOrganPlanInfo(Long organId) {

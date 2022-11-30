@@ -1,5 +1,6 @@
 package com.lt.modules.sys.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lt.common.BaseResponse;
 import com.lt.common.ErrorCode;
 import com.lt.common.annotation.SysLog;
@@ -41,8 +42,13 @@ public class OrganPlanController extends AbstractController {
      */
     @RequiresPermissions("sys:organ:list")
     @GetMapping("/list")
-    public BaseResponse list(@RequestParam(required = false) Integer lowTime,
-                             @RequestParam(required = false) Integer highTime) {
+    public BaseResponse getAllOrganPlanByPage(Integer pageNo, Integer PageSize,
+                                              @RequestParam(required = false) Integer lowTime,
+                                              @RequestParam(required = false) Integer highTime) {
+        if (pageNo == null || PageSize == null) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR, "参数错误");
+        }
+//        Page<OrganPlanVO> page = organPlanService.getAllOrganPlanByPage(pageNo, PageSize, lowTime, highTime, startTime, endTime);
         PageUtils page = organPlanService.queryPage(lowTime, highTime);
         return ResultUtils.success(page);
     }

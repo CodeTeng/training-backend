@@ -15,7 +15,8 @@ public interface OssService {
      */
     String uploadFileAvatar(MultipartFile file);
 
-    /**s
+    /**
+     * s
      * 根据视频或图片名删除
      */
     void deleteObject(String key);

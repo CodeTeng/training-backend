@@ -2,6 +2,7 @@ package com.lt.modules.sys.model.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,7 +11,13 @@ import java.util.Date;
  * @date: 2022/11/23 15:46
  */
 @Data
-public class UserInfoVO {
+public class UserInfoVO implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 用户id
+     */
+    private Long id;
 
     /**
      * 用户账号
@@ -51,11 +58,6 @@ public class UserInfoVO {
      * 用户性别 0-男 1-女
      */
     private Integer sex;
-
-    /**
-     * 账号状态 0-正常 1-停用 2-审核
-     */
-    private Integer status;
 
     /**
      * 创建时间

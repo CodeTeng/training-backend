@@ -1,6 +1,5 @@
 package com.lt.modules.sys.model.vo.organ;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -54,25 +53,7 @@ public class OrganVO implements Serializable {
     private String intro;
 
     /**
-     * 创建者
-     */
-    private String creator;
-
-    /**
      * 创建时间
      */
     private Date createTime;
-
-    /**
-     * 更新者
-     */
-    private String updater;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

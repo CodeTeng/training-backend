@@ -1,7 +1,6 @@
 package com.lt.listener;
 
 import com.lt.modules.sys.controller.MessageController;
-import com.lt.modules.sys.model.entity.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

@@ -38,10 +38,7 @@
                o.chargePerson,
                o.email,
                o.intro,
-               o.creator,
-               o.createTime,
-               o.updater,
-               o.updateTime
+               o.createTime
         from organ o
                  left join organ_type ot on o.organTypeId = ot.id
         where organTypeId = #{organTypeId};

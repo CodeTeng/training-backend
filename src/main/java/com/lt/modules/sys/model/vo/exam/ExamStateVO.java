@@ -73,17 +73,12 @@ public class ExamStateVO implements Serializable {
     private String tips;
 
     /**
-     * 创建者
-     */
-    private String creator;
-
-    /**
-     * 更新者
-     */
-    private String updater;
-
-    /**
      * 是否考过 true表示考过  false表示没有考过
      */
     private Boolean flag;
+
+    /**
+     * 创建者
+     */
+    private String creator;
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 /**
  * @author teng
  * @description 针对表【message(消息表)】的数据库操作Mapper
- * @createDate 2022-11-20 16:35:21
+ * @createDate 2022-11-30 20:03:39
  * @Entity com.lt.modules.sys.model.entity.Message
  */
 @Repository

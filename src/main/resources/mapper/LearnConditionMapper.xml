@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lt.modules.sys.mapper.LearnConditionMapper">
+
+    <resultMap id="BaseResultMap" type="com.lt.modules.sys.model.entity.LearnCondition">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="userId" column="userId" jdbcType="BIGINT"/>
+        <result property="videoId" column="videoId" jdbcType="BIGINT"/>
+        <result property="isDone" column="isDone" jdbcType="TINYINT"/>
+        <result property="doneTime" column="doneTime" jdbcType="TIMESTAMP"/>
+        <result property="complete" column="complete" jdbcType="INTEGER"/>
+        <result property="creator" column="creator" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updater" column="updater" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userId,videoId,
+        isDone,doneTime,complete,
+        creator,createTime,updater,
+        updateTime,isDelete
+    </sql>
+</mapper>

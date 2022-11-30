@@ -1,9 +1,8 @@
 package com.lt.modules.sys.service;
 
 import com.lt.common.utils.PageUtils;
-import com.lt.modules.sys.model.dto.message.MessageAddRequest;
-import com.lt.modules.sys.model.entity.Message;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lt.modules.sys.model.entity.Message;
 
 import java.util.List;
 import java.util.Map;

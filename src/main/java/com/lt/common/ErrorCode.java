@@ -22,7 +22,6 @@ public enum ErrorCode {
     CAPTCHA_ERROR(50003, "验证码错误"),
     LOGIN_ERROR(50004, "账号或密码错误"),
     UPDATE_ERROR(50005, "修改失败"),
-
     UPLOAD_ERROR(50006, "上传文件失败");
 
     /**
