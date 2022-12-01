@@ -3,6 +3,7 @@ package com.lt.modules.sys.controller;
 import ch.qos.logback.core.recovery.ResilientFileOutputStream;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lt.common.annotation.SysLog;
+import com.lt.modules.app.service.FaceService;
 import com.lt.modules.sys.model.dto.user.*;
 import com.lt.modules.sys.model.entity.Organ;
 import com.lt.modules.sys.model.entity.User;
@@ -43,6 +44,9 @@ public class UserController extends AbstractController {
 
     @Autowired
     private OrganService organService;
+
+    @Autowired
+    private FaceService faceService;
 
     /**
      * 分页用户列表
@@ -228,11 +232,11 @@ public class UserController extends AbstractController {
         user.setUpdater(getUser().getUsername());
         userService.updateById(user);
         boolean flag = userService.removeById(id);
+        // 删除腾讯云中的人员
+        faceService.deletePerson(id);
         if (!flag) {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR, "删除失败");
         }
-        // TODO 反序列化错误
-//        userService.deleteBatch(userIds);
         return ResultUtils.success(flag);
     }
 }

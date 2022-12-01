@@ -60,6 +60,11 @@ public class UserInfoVO implements Serializable {
     private Integer sex;
 
     /**
+     * 账号状态 0-正常 1-停用 2-审核
+     */
+    private Integer status;
+
+    /**
      * 创建时间
      */
     private Date createTime;
