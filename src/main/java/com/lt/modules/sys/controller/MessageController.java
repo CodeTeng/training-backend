@@ -1,6 +1,7 @@
 package com.lt.modules.sys.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lt.common.BaseResponse;
 import com.lt.common.ErrorCode;
 import com.lt.common.annotation.SysLog;
@@ -10,6 +11,7 @@ import com.lt.listener.MyPublisher;
 import com.lt.modules.sys.model.dto.message.MessageAddRequest;
 import com.lt.modules.sys.model.entity.Message;
 import com.lt.modules.sys.model.entity.MessageUser;
+import com.lt.modules.sys.model.vo.message.MessageVO;
 import com.lt.modules.sys.service.MessageService;
 import com.lt.modules.sys.service.MessageUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -46,8 +48,9 @@ public class MessageController extends AbstractController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("sys:message:list")
-    public BaseResponse page(@RequestParam Map<String, Object> params) {
-        PageUtils page = messageService.queryPage(params);
+    public BaseResponse queryPage(Integer pageNo, Integer pageSize,
+                                  @RequestParam(required = false) String title) {
+        Page<Message> page = messageService.queryPage(pageNo, pageSize, title);
         return ResultUtils.success(page);
     }
 
@@ -117,8 +120,7 @@ public class MessageController extends AbstractController {
         BeanUtils.copyProperties(messageAddRequest, message);
         message.setCreator(getUser().getUsername());
         messageService.saveMessage(message, userIds);
-        // TODO 应该给用户添加个收到的消息个数 不然不会实时更新 或者前端每次刷新调用
-        myPublisher.pushListener(message, userIds);
+//        myPublisher.pushListener(message, userIds);
         return ResultUtils.success(true);
     }
 

@@ -1,8 +1,10 @@
 package com.lt.modules.sys.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lt.common.utils.PageUtils;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lt.modules.sys.model.entity.Message;
+import com.lt.modules.sys.model.vo.message.MessageVO;
 
 import java.util.List;
 import java.util.Map;
@@ -14,11 +16,11 @@ import java.util.Map;
  */
 public interface MessageService extends IService<Message> {
 
-    PageUtils queryPage(Map<String, Object> params);
-
     List<Message> getUserMessage(Long userId);
 
     void saveMessage(Message message, List<Long> userIds);
 
     void updateMessage(Message message, List<Long> userIds);
+
+    Page<Message> queryPage(Integer pageNo, Integer pageSize, String title);
 }

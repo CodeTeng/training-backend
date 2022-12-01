@@ -2,15 +2,18 @@ package com.lt.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lt.common.utils.PageUtils;
 import com.lt.common.utils.Query;
 import com.lt.modules.sys.mapper.MessageMapper;
 import com.lt.modules.sys.model.entity.Message;
 import com.lt.modules.sys.model.entity.MessageUser;
+import com.lt.modules.sys.model.vo.message.MessageVO;
 import com.lt.modules.sys.service.MessageService;
 import com.lt.modules.sys.service.MessageUserService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,15 +37,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message>
     private MessageMapper messageMapper;
 
     @Override
-    public PageUtils queryPage(Map<String, Object> params) {
-        String title = (String) params.get("title");
-        IPage<Message> page = this.page(
-                new Query<Message>().getPage(params),
-                new QueryWrapper<Message>()
-                        .like(StringUtils.isNotBlank(title), "title", title)
-                        .eq("isDelete", 0)
+    public Page<Message> queryPage(Integer pageNo, Integer pageSize, String title) {
+        QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotBlank(title), "title", title);
+        Page<Message> messagePage = this.page(
+                new Page<>(pageNo, pageSize),
+                queryWrapper
         );
-        return new PageUtils(page);
+        return messagePage;
     }
 
     @Override

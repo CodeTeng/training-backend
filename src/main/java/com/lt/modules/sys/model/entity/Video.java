@@ -7,7 +7,6 @@ import java.util.Date;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 
 /**
  * 视频表
@@ -37,7 +36,6 @@ public class Video implements Serializable {
     /**
      * 视频标题
      */
-    @NotBlank(message = "视频标题不能为空")
     private String videoTitle;
 
     /**
@@ -48,7 +46,6 @@ public class Video implements Serializable {
     /**
      * 视频地址
      */
-    @NotBlank(message = "视频地址不能为空")
     private String videoUrl;
 
     /**
